@@ -1,424 +1,786 @@
-python3 << 'PYEOF'
-with open('/tmp/ss_b64.txt') as f:
-    b64 = f.read().strip()
-ss_img = f"data:image/png;base64,{b64}"
-
-html = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sewer Soldiers Shop</title>
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sewer Soldier Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --g:#00ff66;--gd:#00cc44;--gdd:#008822;--gddd:#003311;
-  --bg:#060e07;--card:#0b1a0d;--card2:#0f200f;
-  --text:#d4fce0;--muted:#5fa870;--gold:#ffd700;
-  --hf:'Black Han Sans',sans-serif;--bf:'Nunito',sans-serif;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--bf);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,#00ff2208,transparent 70%);pointer-events:none;z-index:0}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--gdd);border-radius:3px}
+  :root {
+    --green: #00ff88;
+    --green-dim: #00cc66;
+    --green-dark: #003322;
+    --green-glow: rgba(0,255,136,0.15);
+    --green-glow-strong: rgba(0,255,136,0.35);
+    --bg: #060e08;
+    --bg2: #0a1a0e;
+    --bg3: #0d2214;
+    --card-bg: #0a1a0e;
+    --border: rgba(0,255,136,0.2);
+    --border-bright: rgba(0,255,136,0.5);
+    --text: #c8f5d8;
+    --text-muted: #6aab80;
+    --gold: #f5c842;
+    --red: #ff4444;
+  }
 
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:#040c05f0;backdrop-filter:blur(16px);border-bottom:1px solid #00ff3322;display:flex;align-items:center;justify-content:space-between;padding:.7rem 2rem;gap:1rem}
-.nav-brand{display:flex;align-items:center;gap:.7rem;text-decoration:none}
-.nav-brand img{width:44px;height:44px;border-radius:10px;object-fit:cover;filter:drop-shadow(0 0 8px #00ff66)}
-.nav-brand span{font-family:var(--hf);font-size:1.4rem;color:var(--g);text-shadow:0 0 14px #00ff6688;letter-spacing:.05em}
-.nav-tabs{display:flex;gap:.3rem;flex-wrap:wrap}
-.nav-tab{background:transparent;border:1px solid transparent;color:var(--muted);font-family:var(--bf);font-weight:700;font-size:.82rem;padding:.4rem .9rem;border-radius:20px;cursor:pointer;transition:all .2s;letter-spacing:.04em;text-transform:uppercase}
-.nav-tab:hover,.nav-tab.active{background:#00ff2215;border-color:#00ff3344;color:var(--g);text-shadow:0 0 8px #00ff6688}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
 
-/* HERO */
-.hero{position:relative;z-index:1;text-align:center;padding:4rem 1.5rem 3rem;display:flex;flex-direction:column;align-items:center;gap:1.2rem}
-.hero-img{width:120px;height:120px;border-radius:18px;object-fit:cover;filter:drop-shadow(0 0 30px #00ff66aa);animation:bob 3.5s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.hero h1{font-family:var(--hf);font-size:clamp(2.2rem,6vw,4rem);color:var(--g);text-shadow:0 0 40px #00ff6666;letter-spacing:.06em}
-.hero p{color:var(--muted);font-size:1rem;max-width:480px}
-.hero-badges{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
-.hbadge{background:#00ff2218;border:1px solid #00ff3344;color:var(--g);font-size:.75rem;font-weight:800;padding:.3rem .8rem;border-radius:20px;letter-spacing:.07em;text-transform:uppercase}
-.hbadge.gold{background:#ffd70018;border-color:#ffd70044;color:var(--gold)}
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
 
-/* CONTENT */
-.content{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 1.2rem 4rem}
+  /* Header */
+  header {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    position: relative;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,255,136,0.12) 0%, transparent 70%);
+    border-bottom: 1px solid var(--border);
+  }
 
-/* SECTION */
-.section{margin-bottom:3rem;display:none}
-.section.active{display:block}
-.section-title{font-family:var(--hf);font-size:1.7rem;color:var(--g);text-shadow:0 0 15px #00ff6644;margin-bottom:1.5rem;letter-spacing:.05em;display:flex;align-items:center;gap:.7rem}
-.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#00ff3333,transparent)}
+  .logo-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
 
-/* CARDS GRID */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem}
+  .ss-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 900;
+    color: var(--green);
+    text-shadow: 0 0 20px var(--green), 0 0 60px rgba(0,255,136,0.4), 0 0 100px rgba(0,255,136,0.2);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    -webkit-text-stroke: 1px rgba(0,255,136,0.6);
+  }
 
-/* CARD */
-.card{background:var(--card);border:1px solid #00ff2220;border-radius:14px;padding:1.3rem;display:flex;flex-direction:column;gap:.7rem;position:relative;transition:transform .2s,border-color .2s,box-shadow .2s;overflow:hidden}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gdd),transparent);opacity:0;transition:opacity .2s}
-.card:hover{transform:translateY(-3px);border-color:#00ff4440;box-shadow:0 8px 32px #00ff221a}
-.card:hover::before{opacity:1}
-.card-icon{width:48px;height:48px;border-radius:10px;background:#00ff2215;border:1px solid #00ff3330;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
-.card-name{font-family:var(--hf);font-size:1.05rem;color:var(--text);letter-spacing:.03em;line-height:1.2}
-.card-desc{font-size:.8rem;color:var(--muted);line-height:1.5;flex:1}
-.card-price{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:.7rem;border-top:1px solid #00ff2215}
-.price-val{font-family:var(--hf);font-size:1.3rem;color:var(--g);text-shadow:0 0 8px #00ff6655}
-.price-val.boost{color:var(--gold);text-shadow:0 0 8px #ffd70055}
-.badge-hot{position:absolute;top:.75rem;right:.75rem;background:var(--g);color:#000;font-size:.6rem;font-weight:900;padding:.15rem .45rem;border-radius:4px;letter-spacing:.08em}
-.badge-limited{position:absolute;top:.75rem;right:.75rem;background:var(--gold);color:#000;font-size:.6rem;font-weight:900;padding:.15rem .45rem;border-radius:4px;letter-spacing:.08em}
-.buy-btn{background:linear-gradient(135deg,var(--gdd),var(--gd));color:#000;font-family:var(--bf);font-weight:900;font-size:.8rem;padding:.4rem .9rem;border-radius:7px;border:none;cursor:pointer;transition:all .2s;letter-spacing:.04em}
-.buy-btn:hover{background:var(--g);box-shadow:0 0 14px #00ff6655}
+  .rat-icon {
+    font-size: 3rem;
+    filter: drop-shadow(0 0 8px var(--green));
+    animation: ratbob 2s ease-in-out infinite;
+  }
 
-/* BIG SECTION TITLE (guns) */
-.big-title{font-family:var(--hf);font-size:clamp(2rem,5vw,3.5rem);color:var(--g);text-shadow:0 0 30px #00ff6644;text-align:center;margin:2rem 0 .5rem;letter-spacing:.06em}
-.big-subtitle{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:1.5rem}
+  @keyframes ratbob {
+    0%, 100% { transform: translateY(0px) rotate(-3deg); }
+    50% { transform: translateY(-6px) rotate(3deg); }
+  }
 
-/* RANK ITEM */
-.rank-item{background:var(--card);border:1px solid #00ff2220;border-radius:12px;padding:1.1rem 1.3rem;display:flex;flex-direction:column;gap:.5rem;transition:border-color .2s,box-shadow .2s}
-.rank-item:hover{border-color:#00ff4440;box-shadow:0 4px 20px #00ff221a}
-.rank-name{font-family:var(--hf);font-size:1rem;color:var(--g);letter-spacing:.04em}
-.rank-guns{font-size:.82rem;color:var(--muted);line-height:1.6}
-.rank-tag{font-size:.72rem;color:var(--gdd);font-weight:800;text-transform:uppercase;letter-spacing:.06em}
-.rank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.8rem}
+  .shop-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    letter-spacing: 0.4em;
+    color: var(--green-dim);
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+  }
 
-/* PAYMENTS */
-.pay-box{background:var(--card);border:1px solid #00ff2220;border-radius:14px;padding:1.8rem;max-width:480px;margin:0 auto;text-align:center}
-.pay-title{font-family:var(--hf);font-size:1.5rem;color:var(--g);margin-bottom:1.2rem}
-.pay-methods{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;margin-bottom:1.5rem}
-.pay-pill{background:#00ff2218;border:1px solid #00ff3340;color:var(--text);font-weight:700;font-size:.85rem;padding:.5rem 1.1rem;border-radius:20px;display:flex;align-items:center;gap:.4rem}
-.no-refund{background:#ff003315;border:1px solid #ff003340;color:#ff6666;font-weight:900;font-size:.85rem;padding:.6rem 1.2rem;border-radius:8px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1.2rem}
-.trusted-box{background:#ffd70010;border:1px solid #ffd70030;border-radius:10px;padding:.9rem;color:var(--gold);font-weight:800;font-size:.88rem;line-height:1.6}
-.trusted-box span{color:#fff;font-weight:400}
+  .tagline {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 0.2em;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+  }
 
-/* FOOTER */
-footer{position:relative;z-index:1;border-top:1px solid #00ff2220;text-align:center;padding:2rem;color:var(--muted);font-size:.82rem;display:flex;flex-direction:column;align-items:center;gap:.7rem}
-.footer-brand{display:flex;align-items:center;gap:.5rem;font-family:var(--hf);font-size:1.1rem;color:var(--g)}
-.footer-brand img{width:28px;height:28px;border-radius:6px}
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
+  }
+  .divider-icon { color: var(--green); font-size: 1.2rem; }
 
-@media(max-width:600px){nav{padding:.6rem 1rem}.nav-tab{font-size:.7rem;padding:.3rem .6rem}.grid{grid-template-columns:1fr 1fr}}
+  /* Nav tabs */
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  nav button {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+  nav button:hover, nav button.active {
+    background: var(--green-glow);
+    border-color: var(--green);
+    color: var(--green);
+    box-shadow: 0 0 12px var(--green-glow-strong);
+  }
+
+  /* Main content */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* Sections */
+  section {
+    display: none;
+  }
+  section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Section header */
+  .section-header {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(0,255,136,0.5);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.1em;
+  }
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* Item Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .item-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.3rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .item-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, var(--green), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .item-card:hover {
+    border-color: var(--border-bright);
+    background: #0e221a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,255,136,0.1);
+  }
+
+  .item-card:hover::before { opacity: 1; }
+
+  .card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--green-glow);
+    border: 1px solid var(--border);
+    color: var(--green);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    margin-bottom: 0.8rem;
+    font-family: 'Orbitron', monospace;
+  }
+
+  .card-badge.gold {
+    background: rgba(245,200,66,0.1);
+    border-color: rgba(245,200,66,0.3);
+    color: var(--gold);
+  }
+
+  .card-badge.staff {
+    background: rgba(100,100,255,0.1);
+    border-color: rgba(100,100,255,0.3);
+    color: #8888ff;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.95rem;
+    color: #e0ffe0;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .card-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .card-price {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--green);
+    text-shadow: 0 0 10px rgba(0,255,136,0.4);
+  }
+
+  .card-price.gold-price { color: var(--gold); }
+  .card-price.boost-price { color: #aa88ff; }
+
+  .rat-emoji { margin-right: 0.3rem; }
+
+  /* Rank tiers */
+  .rank-section {
+    margin-bottom: 3rem;
+  }
+  .rank-section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    color: var(--green);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.7rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 15px rgba(0,255,136,0.4);
+  }
+
+  /* Rank cards for guns — full width table style */
+  .rank-row {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.3rem;
+    margin-bottom: 0.8rem;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 1rem;
+    align-items: start;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rank-row::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--green), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .rank-row:hover {
+    border-color: var(--border-bright);
+    background: #0e221a;
+  }
+  .rank-row:hover::after { opacity: 1; }
+
+  .rank-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    padding-right: 1rem;
+    border-right: 1px solid var(--border);
+  }
+
+  .rank-req {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  .rank-guns {
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .gun-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(0,255,136,0.05);
+    border: 1px solid rgba(0,255,136,0.12);
+    border-radius: 3px;
+    padding: 0.1rem 0.5rem;
+    margin: 0.15rem 0.2rem 0.15rem 0;
+    font-size: 0.78rem;
+    color: #b0e8c0;
+  }
+
+  .gun-item.special {
+    background: rgba(245,200,66,0.08);
+    border-color: rgba(245,200,66,0.2);
+    color: #f5e0a0;
+  }
+
+  /* Payments section */
+  .payment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .payment-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.2rem;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .payment-card:hover {
+    border-color: var(--green);
+    background: var(--green-glow);
+    box-shadow: 0 0 15px var(--green-glow);
+  }
+
+  .payment-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; filter: drop-shadow(0 0 4px var(--green)); }
+  .payment-name { font-family: 'Orbitron', monospace; font-size: 0.75rem; color: var(--text); letter-spacing: 0.1em; }
+
+  .no-refund-box {
+    background: rgba(255,68,68,0.08);
+    border: 1px solid rgba(255,68,68,0.3);
+    border-radius: 4px;
+    padding: 1rem 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+    color: var(--red);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  .trusted-box {
+    background: linear-gradient(135deg, rgba(0,255,136,0.06), rgba(0,255,136,0.02));
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 1.2rem 1.5rem;
+    text-align: center;
+  }
+
+  .trusted-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.7rem;
+  }
+
+  .trusted-names {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .trusted-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--green);
+    text-shadow: 0 0 12px rgba(0,255,136,0.5);
+    letter-spacing: 0.1em;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    background: radial-gradient(ellipse at 50% 100%, rgba(0,255,136,0.04) 0%, transparent 70%);
+  }
+
+  /* Corner decoration */
+  .corner-deco {
+    position: absolute;
+    width: 20px; height: 20px;
+    border-color: var(--green-dim);
+    border-style: solid;
+    opacity: 0.4;
+  }
+  .corner-tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+  .corner-tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+  /* Glow pulse on section titles */
+  @keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(0,255,136,0.3); }
+    50% { text-shadow: 0 0 25px rgba(0,255,136,0.7), 0 0 50px rgba(0,255,136,0.3); }
+  }
+  .rank-section-title { animation: pulse-glow 3s ease-in-out infinite; }
+
+  @media (max-width: 600px) {
+    .rank-row { grid-template-columns: 1fr; }
+    .rank-name { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  }
 </style>
 </head>
 <body>
 
-<nav>
-  <a class="nav-brand" href="#">
-    <img src="SS_IMG_PLACEHOLDER" alt="SS">
-    <span>SEWER SOLDIERS</span>
-  </a>
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showTab('cosmetics',this)">Cosmetics</button>
-    <button class="nav-tab" onclick="showTab('access',this)">Access Ranks</button>
-    <button class="nav-tab" onclick="showTab('staff',this)">Staff Ranks</button>
-    <button class="nav-tab" onclick="showTab('payments',this)">Payments</button>
-    <button class="nav-tab" onclick="showTab('guns',this)">Rank Guns</button>
+<header>
+  <div class="logo-area">
+    <span class="rat-icon">🐀</span>
+    <div class="ss-logo">SS</div>
+    <span class="rat-icon" style="animation-delay: 0.5s;">🐀</span>
   </div>
+  <div class="shop-title">Sewer Soldier Shop</div>
+  <div class="tagline">☘ St. Paddy's Season — Exclusive Drops ☘</div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('cosmetics')">🎨 Cosmetics</button>
+  <button onclick="showTab('access')">⚔️ Access Ranks</button>
+  <button onclick="showTab('staff')">🛡️ Staff Ranks</button>
+  <button onclick="showTab('guns-cali')">🔫 Cali Guns</button>
+  <button onclick="showTab('guns-slr')">🔫 SLR Guns</button>
+  <button onclick="showTab('payments')">💳 Payments</button>
 </nav>
 
-<div class="hero">
-  <img class="hero-img" src="SS_IMG_PLACEHOLDER" alt="Sewer Soldiers">
-  <h1>SEWER SOLDIERS</h1>
-  <p>Official SS shop — grab your rank, flex your gear, dominate the server.</p>
-  <div class="hero-badges">
-    <span class="hbadge">🐀 Official Store</span>
-    <span class="hbadge gold">⚡ Trusted Sellers</span>
-    <span class="hbadge">🔒 Secure Orders</span>
-  </div>
-</div>
-
-<div class="content">
+<main>
 
   <!-- COSMETICS -->
-  <div class="section active" id="tab-cosmetics">
-    <div class="section-title">🎨 Cosmetics</div>
-    <div class="grid">
-      <div class="card">
-        <div class="card-icon">📸</div>
-        <div class="card-name">Pic Perms</div>
-        <div class="card-desc">Permission to post pictures in the server. Flex your fits and your clips.</div>
-        <div class="card-price">
-          <span class="price-val">$1 USD</span>
-          <button class="buy-btn">Buy Now</button>
-        </div>
+  <section id="cosmetics" class="active">
+    <h2 class="section-header">🎨 Cosmetics</h2>
+    <p class="section-sub">Personalize your SS identity</p>
+    <div class="cards-grid">
+      <div class="item-card">
+        <div class="corner-deco corner-tl"></div><div class="corner-deco corner-br"></div>
+        <div class="card-badge">🐀 Cosmetic</div>
+        <div class="card-title">Pic Perms</div>
+        <div class="card-desc">Permission to use SS imagery and set custom pictures within the community.</div>
+        <div class="card-price">$1 USD</div>
       </div>
-      <div class="card">
-        <span class="badge-hot">HOT</span>
-        <div class="card-icon">⭐</div>
-        <div class="card-name">SS VIP Member</div>
-        <div class="card-desc">Exclusive VIP member cosmetic. Stand out from the crowd with the VIP tag.</div>
-        <div class="card-price">
-          <span class="price-val">$3 USD</span>
-          <button class="buy-btn">Buy Now</button>
-        </div>
+      <div class="item-card">
+        <div class="corner-deco corner-tl"></div><div class="corner-deco corner-br"></div>
+        <div class="card-badge gold">⭐ VIP</div>
+        <div class="card-title">SS VIP Member</div>
+        <div class="card-desc">Exclusive VIP member status with special perks and access in the Sewer Soldiers community.</div>
+        <div class="card-price gold-price">$3 USD</div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- ACCESS RANKS -->
-  <div class="section" id="tab-access">
-    <div class="section-title">🐀 Access Ranks</div>
-    <div class="grid">
-      <div class="card">
-        <div class="card-icon">🐀</div>
-        <div class="card-name">SS Tactical Rat</div>
-        <div class="card-desc">Entry level combat access. Start your journey with the Sewer Soldiers.</div>
-        <div class="card-price">
-          <span class="price-val boost">2x Server Boost</span>
-          <button class="buy-btn">Buy Now</button>
-        </div>
+  <section id="access">
+    <h2 class="section-header">⚔️ Access Ranks</h2>
+    <p class="section-sub">Rise through the ranks of the Sewer Soldiers</p>
+    <div class="cards-grid">
+      <div class="item-card">
+        <div class="corner-deco corner-tl"></div><div class="corner-deco corner-br"></div>
+        <div class="card-badge">🐀 Rank I</div>
+        <div class="card-title">SS Taticial Rat</div>
+        <div class="card-desc">Entry-level access rank. Unlocks tactical gear and basic SS privileges.</div>
+        <div class="card-price boost-price">2× Server Boost</div>
       </div>
-      <div class="card">
-        <div class="card-icon">🔫</div>
-        <div class="card-name">SS Killa Rat</div>
-        <div class="card-desc">Step up your game. Killa tier access unlocks more firepower.</div>
-        <div class="card-price">
-          <span class="price-val">$4 USD</span>
-          <button class="buy-btn">Buy Now</button>
-        </div>
+      <div class="item-card">
+        <div class="corner-deco corner-tl"></div><div class="corner-deco corner-br"></div>
+        <div class="card-badge">🐀 Rank II</div>
+        <div class="card-title">SS Killa Rat</div>
+        <div class="card-desc">Mid-tier access. Unlocks advanced loadout options and exclusive channels.</div>
+        <div class="card-price">$4 USD</div>
       </div>
-      <div class="card">
-        <span class="badge-hot">HOT</span>
-        <div class="card-icon">🎯</div>
-        <div class="card-name">SS Hitman Rat</div>
-        <div class="card-desc">Professional grade access. Hitman perks, premium guns, and more.</div>
-        <div class="card-price">
-          <span class="price-val">$8 USD</span>
-          <button class="buy-btn">Buy Now</button>
-        </div>
+      <div class="item-card">
+        <div class="corner-deco corner-tl"></div><div class="corner-deco corner-br"></div>
+        <div class="card-badge">🐀 Rank III</div>
+        <div class="card-title">SS Hitman Rat</div>
+        <div class="card-desc">Elevated rank with premium content access and hitman loadout unlocks.</div>
+        <div class="card-price">$8 USD</div>
       </div>
-      <div class="card">
-        <div class="card-icon">🪖</div>
-        <div class="card-name">SS Trooper Rat</div>
-        <div class="card-desc">Elite trooper access. High tier weapons and exclusive perks.</div>
-        <div class="card-price">
-          <span class="price-val">$12 USD</span>
-          <button class="buy-btn">Buy Now</button>
-        </div>
+      <div class="item-card">
+        <div class="corner-deco corner-tl"></div><div class="corner-deco corner-br"></div>
+        <div class="card-badge">🐀 Rank IV</div>
+        <div class="card-title">SS Trooper Rat</div>
+        <div class="card-desc">Elite trooper status with access to top-tier gear and trooper-only perks.</div>
+        <div class="card-price">$12 USD</div>
       </div>
-      <div class="card">
-        <span class="badge-limited">VIP</span>
-        <div class="card-icon">👑</div>
-        <div class="card-name">SS VIP Rat</div>
-        <div class="card-desc">Top tier VIP access. Best guns, exclusives, and the ultimate status.</div>
-        <div class="card-price">
-          <span class="price-val">$20 USD</span>
-          <button class="buy-btn">Buy Now</button>
-        </div>
+      <div class="item-card" style="border-color: rgba(245,200,66,0.3);">
+        <div class="corner-deco corner-tl" style="border-color: var(--gold); opacity: 0.5;"></div>
+        <div class="corner-deco corner-br" style="border-color: var(--gold); opacity: 0.5;"></div>
+        <div class="card-badge gold">👑 VIP Elite</div>
+        <div class="card-title" style="color: var(--gold);">SS VIP Rat</div>
+        <div class="card-desc">The pinnacle access rank. Full VIP benefits, exclusive gear, and top-tier status.</div>
+        <div class="card-price gold-price">$20 USD</div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- STAFF RANKS -->
-  <div class="section" id="tab-staff">
-    <div class="section-title">🛡️ Staff Ranks</div>
-    <div class="grid">
-      <div class="card">
-        <div class="card-icon">📋</div>
-        <div class="card-name">SS Trial Moderator</div>
-        <div class="card-desc">Begin your staff career. Trial mod perks and server permissions.</div>
-        <div class="card-price">
-          <span class="price-val">$25 USD</span>
-          <button class="buy-btn">Buy Now</button>
+  <section id="staff">
+    <h2 class="section-header">🛡️ Staff Ranks</h2>
+    <p class="section-sub">Official Sewer Soldiers staff positions</p>
+    <div class="cards-grid">
+      <div class="item-card">
+        <div class="card-badge staff">🛡️ Staff</div>
+        <div class="card-title">SS Trial Moderator</div>
+        <div class="card-desc">Begin your journey as a probationary moderator. Learn the ropes of SS moderation.</div>
+        <div class="card-price" style="color: #8888ff;">$25 USD</div>
+      </div>
+      <div class="item-card">
+        <div class="card-badge staff">🛡️ Staff</div>
+        <div class="card-title">SS Moderator</div>
+        <div class="card-desc">Full moderation duties with standard moderator permissions across SS platforms.</div>
+        <div class="card-price" style="color: #8888ff;">$30 USD</div>
+      </div>
+      <div class="item-card">
+        <div class="card-badge staff">⚡ Sr. Staff</div>
+        <div class="card-title">SS Head Moderator</div>
+        <div class="card-desc">Lead the moderation team with elevated permissions and oversight responsibilities.</div>
+        <div class="card-price" style="color: #8888ff;">$35 USD</div>
+      </div>
+      <div class="item-card">
+        <div class="card-badge staff">👑 Admin</div>
+        <div class="card-title">SS Head Administrator</div>
+        <div class="card-desc">Administrative authority over SS operations and all moderation personnel.</div>
+        <div class="card-price" style="color: #8888ff;">$40 USD</div>
+      </div>
+      <div class="item-card" style="border-color: rgba(136,136,255,0.4);">
+        <div class="card-badge staff">🌟 Top Staff</div>
+        <div class="card-title" style="color: #aaaaff;">SS Head Of Staff</div>
+        <div class="card-desc">The highest staff rank. Complete oversight of all staff operations in Sewer Soldiers.</div>
+        <div class="card-price" style="color: #8888ff;">$45 USD</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALI GUNS -->
+  <section id="guns-cali">
+    <div class="rank-section">
+      <h2 class="section-header" style="font-size: clamp(1.4rem, 4vw, 2.2rem); letter-spacing: 0.08em;">🔫 CALI SHOOTOUT GUNS</h2>
+      <p class="section-sub">Exclusive custom weapons — unlocked by rank</p>
+      
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Rookie Rat<div class="rank-req">Join The Group</div></div>
+        <div class="rank-guns">
+          <span class="gun-item">🔫 Custom SS 〆 Deagle</span>
+          <span class="gun-item">🔫 Custom SS 〆 Glock 17</span>
         </div>
       </div>
-      <div class="card">
-        <div class="card-icon">⚔️</div>
-        <div class="card-name">SS Moderator</div>
-        <div class="card-desc">Full moderator access. Help keep the server in order.</div>
-        <div class="card-price">
-          <span class="price-val">$30 USD</span>
-          <button class="buy-btn">Buy Now</button>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Shoota Rat<div class="rank-req">Free Access — Discord Steps</div></div>
+        <div class="rank-guns">
+          <span class="gun-item">🔫 Custom SS 〆 Vector</span>
+          <span class="gun-item">🔫 Custom SS 〆 Uzi Drum</span>
         </div>
       </div>
-      <div class="card">
-        <span class="badge-hot">HOT</span>
-        <div class="card-icon">🔰</div>
-        <div class="card-name">SS Head Moderator</div>
-        <div class="card-desc">Lead the moderation team. Head mod powers and premium status.</div>
-        <div class="card-price">
-          <span class="price-val">$35 USD</span>
-          <button class="buy-btn">Buy Now</button>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Taticial Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item">🔫 Custom SS 〆 AK47</span>
+          <span class="gun-item">🔫 Custom SS 〆 AR-15</span>
         </div>
       </div>
-      <div class="card">
-        <div class="card-icon">🏅</div>
-        <div class="card-name">SS Head Administrator</div>
-        <div class="card-desc">Administrator rank with expanded control and authority.</div>
-        <div class="card-price">
-          <span class="price-val">$40 USD</span>
-          <button class="buy-btn">Buy Now</button>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Killa Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item special">🦺 Vest Access</span>
+          <span class="gun-item special">🩹 Gatorade Healable Item</span>
+          <span class="gun-item">🎭 Custom SS Mask</span>
+          <span class="gun-item special">🔫 Auto SS M1911 Switch Drum <small>(3 Tap)</small></span>
+          <span class="gun-item special">🔫 Auto SS Spas-12</span>
         </div>
       </div>
-      <div class="card">
-        <span class="badge-limited">TOP</span>
-        <div class="card-icon">💎</div>
-        <div class="card-name">SS Head Of Staff</div>
-        <div class="card-desc">The pinnacle of staff. Supreme authority and all-access permissions.</div>
-        <div class="card-price">
-          <span class="price-val">$45 USD</span>
-          <button class="buy-btn">Buy Now</button>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Hitman Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item special">🔫 Auto SS M4A1 <small>(2 Tap)</small></span>
+          <span class="gun-item special">🔫 Auto SS PKM</span>
+          <span class="gun-item special">🔫 Auto SS 〆 Kilo</span>
+        </div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Trooper Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item special">🔫 Auto SS 〆 Rat <small>(1 Tap)</small></span>
+          <span class="gun-item special">🎯 SS 〆 M1 Grand <small>(Sniper Scope + 1 Tap)</small></span>
+        </div>
+      </div>
+      <div class="rank-row" style="border-color: rgba(245,200,66,0.3);">
+        <div class="rank-name" style="color: var(--gold);">👑 SS VIP Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item special">🔫 Auto SS Rat Access <small>(1 Tap)</small></span>
+          <span class="gun-item special">🎯 SS 〆 M1 Grand <small>(Sniper Scope + 1 Tap)</small></span>
+          <span class="gun-item" style="background: rgba(150,100,255,0.1); border-color: rgba(150,100,255,0.3); color: #d0b0ff;">🌈 Custom Rainbow G36C <small>(No Recoil + 1 Tap)</small></span>
         </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- SLR GUNS -->
+  <section id="guns-slr">
+    <div class="rank-section">
+      <h2 class="section-header" style="font-size: clamp(1.2rem, 3.5vw, 2rem); letter-spacing: 0.06em;">🔫 STREET LIFE REMASTERED GUNS</h2>
+      <p class="section-sub">SLR exclusive weapon unlocks — ranked access</p>
+
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Rookie Rat<div class="rank-req">Join The Group</div></div>
+        <div class="rank-guns">
+          <span class="gun-item">🔫 Ruger</span>
+          <span class="gun-item">💥 Ammunition</span>
+        </div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Shoota Rat<div class="rank-req">Free Access — Discord Steps</div></div>
+        <div class="rank-guns">
+          <span class="gun-item">🔫 Glock 19X</span>
+          <span class="gun-item">💥 Menots</span>
+        </div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Taticial Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item">🔫 Skorpion</span>
+        </div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Killa Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item special">🦺 Military Vest</span>
+          <span class="gun-item special">🔫 GlockSwitch</span>
+        </div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Hitta Man</div>
+        <div class="rank-guns">
+          <span class="gun-item special">🔫 MP5</span>
+        </div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-name">🐀 SS Troopa Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item special">🔫 Tec-9</span>
+        </div>
+      </div>
+      <div class="rank-row" style="border-color: rgba(245,200,66,0.3);">
+        <div class="rank-name" style="color: var(--gold);">👑 SS VIP Rat</div>
+        <div class="rank-guns">
+          <span class="gun-item special">🔫 ARP Drum</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- PAYMENTS -->
-  <div class="section" id="tab-payments">
-    <div class="section-title">💳 Payments</div>
-    <div class="pay-box">
-      <div class="pay-title">Accepted Methods</div>
-      <div class="pay-methods">
-        <span class="pay-pill">💰 PayPal</span>
-        <span class="pay-pill">📱 Venmo</span>
-        <span class="pay-pill">🍎 Apple Pay</span>
-        <span class="pay-pill">💵 Cash App</span>
-        <span class="pay-pill">🎮 Robux</span>
-      </div>
-      <div class="no-refund">🚫 NO REFUNDS — ALL SALES FINAL</div>
-      <div class="trusted-box">
-        🐀 Only Trusted Sellers Are<br>
-        <span style="color:var(--g);font-size:1.05rem">RatMan</span> &amp; <span style="color:var(--g);font-size:1.05rem">x4xz</span>
-        <br><br>
-        <span>Do not pay anyone else claiming to sell SS ranks. You will be scammed.</span>
-      </div>
-    </div>
-  </div>
+  <section id="payments">
+    <h2 class="section-header">💳 Payments</h2>
+    <p class="section-sub">Accepted payment methods</p>
 
-  <!-- GUNS -->
-  <div class="section" id="tab-guns">
-
-    <div class="big-title">CALI SHOOTOUT GUNS</div>
-    <div class="big-subtitle">Exclusive custom weapons for each rank</div>
-
-    <div class="rank-grid" style="margin-bottom:2.5rem">
-      <div class="rank-item">
-        <div class="rank-tag">Rookie</div>
-        <div class="rank-name">SS Rookie Rat</div>
-        <div class="rank-guns">🔫 Custom SS 〆 Deagle<br>🔫 Custom SS 〆 Glock 17</div>
-        <div style="font-size:.72rem;color:var(--gdd);margin-top:.3rem">Join The Group</div>
+    <div class="payment-grid">
+      <div class="payment-card">
+        <span class="payment-icon">🅿️</span>
+        <div class="payment-name">PayPal</div>
       </div>
-      <div class="rank-item">
-        <div class="rank-tag">Shoota</div>
-        <div class="rank-name">SS Shoota Rat</div>
-        <div class="rank-guns">🔫 Custom SS 〆 Vector<br>🔫 Custom SS 〆 Uzi Drum</div>
-        <div style="font-size:.72rem;color:var(--gdd);margin-top:.3rem">Free Access Steps In Discord</div>
+      <div class="payment-card">
+        <span class="payment-icon">💸</span>
+        <div class="payment-name">Venmo</div>
       </div>
-      <div class="rank-item">
-        <div class="rank-tag">Tactical</div>
-        <div class="rank-name">SS Tactical Rat</div>
-        <div class="rank-guns">🔫 Custom SS 〆 AK-47<br>🔫 Custom SS 〆 AR-15</div>
+      <div class="payment-card">
+        <span class="payment-icon">🍎</span>
+        <div class="payment-name">Apple Pay</div>
       </div>
-      <div class="rank-item">
-        <div class="rank-tag">Killa</div>
-        <div class="rank-name">SS Killa Rat</div>
-        <div class="rank-guns">🦺 Vest Access<br>🧃 Gatorade Healable Item<br>🎭 Custom SS Mask<br>🔫 Custom Auto SS M1911 Switch Drum (3 Tap)<br>🔫 Custom Auto SS Spas-12</div>
+      <div class="payment-card">
+        <span class="payment-icon">💵</span>
+        <div class="payment-name">Cash App</div>
       </div>
-      <div class="rank-item">
-        <div class="rank-tag">Hitman</div>
-        <div class="rank-name">SS Hitman Rat</div>
-        <div class="rank-guns">🔫 Custom Auto SS M4A1 (2 Tap)<br>🔫 Custom Auto SS PKM<br>🔫 Custom Auto SS 〆 Kilo</div>
-      </div>
-      <div class="rank-item">
-        <div class="rank-tag">Trooper</div>
-        <div class="rank-name">SS Trooper Rat</div>
-        <div class="rank-guns">🔫 Custom Auto SS 〆 Rat (1 Tap)<br>🔫 Custom SS 〆 M1 Garand (Sniper Scope + 1 Tap)</div>
-      </div>
-      <div class="rank-item" style="border-color:#ffd70030;background:linear-gradient(135deg,var(--card),#1a1500)">
-        <div class="rank-tag" style="color:var(--gold)">VIP</div>
-        <div class="rank-name" style="color:var(--gold)">SS VIP Rat</div>
-        <div class="rank-guns">🔫 Custom Auto SS Rat (1 Tap)<br>🔫 Custom SS 〆 M1 Garand (Sniper Scope + 1 Tap)<br>🌈 Custom Rainbow G36C (No Recoil + 1 Tap)</div>
+      <div class="payment-card">
+        <span class="payment-icon">🎮</span>
+        <div class="payment-name">Robux</div>
       </div>
     </div>
 
-    <div class="big-title">STREET LIFE REMASTERED GUNS</div>
-    <div class="big-subtitle">Classic street weapons for each rank tier</div>
-
-    <div class="rank-grid">
-      <div class="rank-item">
-        <div class="rank-tag">Rookie</div>
-        <div class="rank-name">SS Rookie Rat</div>
-        <div class="rank-guns">🔫 Ruger<br>🟡 Ammunition</div>
-        <div style="font-size:.72rem;color:var(--gdd);margin-top:.3rem">Join The Group</div>
-      </div>
-      <div class="rank-item">
-        <div class="rank-tag">Shoota</div>
-        <div class="rank-name">SS Shoota Rat</div>
-        <div class="rank-guns">🔫 Glock 19X<br>🟡 Menots</div>
-        <div style="font-size:.72rem;color:var(--gdd);margin-top:.3rem">Free Access Steps In Discord</div>
-      </div>
-      <div class="rank-item">
-        <div class="rank-tag">Tactical</div>
-        <div class="rank-name">SS Tactical Rat</div>
-        <div class="rank-guns">🔫 Skorpion</div>
-      </div>
-      <div class="rank-item">
-        <div class="rank-tag">Killa</div>
-        <div class="rank-name">SS Killa Rat</div>
-        <div class="rank-guns">🦺 Military Vest<br>🔫 Glock Switch</div>
-      </div>
-      <div class="rank-item">
-        <div class="rank-tag">Hitta Man</div>
-        <div class="rank-name">SS Hitta Man</div>
-        <div class="rank-guns">🔫 MP5</div>
-      </div>
-      <div class="rank-item">
-        <div class="rank-tag">Troopa</div>
-        <div class="rank-name">SS Troopa Rat</div>
-        <div class="rank-guns">🔫 Tec-9</div>
-      </div>
-      <div class="rank-item" style="border-color:#ffd70030;background:linear-gradient(135deg,var(--card),#1a1500)">
-        <div class="rank-tag" style="color:var(--gold)">VIP</div>
-        <div class="rank-name" style="color:var(--gold)">SS VIP Rat</div>
-        <div class="rank-guns">🔫 ARP Drum</div>
-      </div>
+    <div class="no-refund-box">
+      <span style="font-size: 1.5rem;">⚠️</span>
+      <span>NO REFUNDS — ALL SALES ARE FINAL</span>
     </div>
 
-  </div>
+    <div class="divider"><span class="divider-icon">🐀</span></div>
 
-</div>
+    <div class="trusted-box">
+      <div class="trusted-title">⭐ Only Trusted Sellers ⭐</div>
+      <div class="trusted-names">
+        <span class="trusted-name">🐀 RatMan</span>
+        <span style="color: var(--text-muted); font-size: 1.2rem;">&amp;</span>
+        <span class="trusted-name">🐀 x4xz</span>
+      </div>
+    </div>
+  </section>
+
+</main>
 
 <footer>
-  <div class="footer-brand">
-    <img src="SS_IMG_PLACEHOLDER" alt="SS"> Sewer Soldiers © 2025
-  </div>
-  <span>Only buy from RatMan &amp; x4xz — No Refunds</span>
+  <div style="margin-bottom: 0.4rem; font-family: 'Orbitron', monospace; font-size: 0.7rem; color: var(--green); letter-spacing: 0.3em;">SEWER SOLDIERS</div>
+  🐀 Deep in the sewers — always grinding 🐀
 </footer>
 
 <script>
-function showTab(name, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  btn.classList.add('active');
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-document.querySelectorAll('.buy-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    const card = this.closest('.card');
-    const name = card.querySelector('.card-name').textContent;
-    const price = card.querySelector('.price-val').textContent;
-    this.textContent = '✓ Added!';
-    this.style.background = '#00ff66';
-    setTimeout(() => {
-      this.textContent = 'Buy Now';
-      this.style.background = '';
-    }, 1800);
-  });
-});
+  function showTab(id) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 </script>
 </body>
-</html>'''
-
-with open('/tmp/ss_b64.txt') as f:
-    b64 = f.read().strip()
-ss_img = f"data:image/png;base64,{b64}"
-html = html.replace('SS_IMG_PLACEHOLDER', ss_img)
-
-with open('/mnt/user-data/outputs/index.html', 'w') as f:
-    f.write(html)
-print("Done:", len(html), "bytes")
-PYEOF
+</html>
