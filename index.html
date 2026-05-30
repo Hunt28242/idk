@@ -1,516 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The Shop — Jroc & Hunt</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syncopate:wght@700&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#05070f;
-    --bg-2:#0a0f1f;
-    --panel:#0d1426;
-    --panel-2:#111a30;
-    --line:rgba(120,170,255,.12);
-    --line-strong:rgba(120,170,255,.25);
-    --text:#e6edff;
-    --muted:#8493b5;
-    --cyan:#6ee7ff;
-    --blue:#5b8bff;
-    --violet:#a78bfa;
-    --gold:#ffd166;
-    --grad:linear-gradient(135deg,#6ee7ff 0%,#5b8bff 50%,#a78bfa 100%);
-    --radius:16px;
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #030b1a;
+    --panel: #07152e;
+    --panel2: #091c3a;
+    --blue1: #0d6efd;
+    --blue2: #0a84ff;
+    --cyan: #00d4ff;
+    --accent: #1affee;
+    --text: #cce8ff;
+    --muted: #6b9ab8;
+    --border: #0d3460;
+    --gold: #ffd447;
   }
-  html,body{height:100%}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Space Grotesk',system-ui,sans-serif;
-    font-size:16px;line-height:1.55;
-    min-height:100vh;
-    overflow-x:hidden;
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    min-height: 100vh;
     background-image:
-      radial-gradient(900px 500px at 85% -10%,rgba(167,139,250,.18),transparent 60%),
-      radial-gradient(700px 400px at -10% 20%,rgba(91,139,255,.18),transparent 60%),
-      radial-gradient(600px 500px at 50% 110%,rgba(110,231,255,.12),transparent 60%);
-  }
-  /* Animated grid */
-  body::before{
-    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background-image:
-      linear-gradient(rgba(120,170,255,.06) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(120,170,255,.06) 1px,transparent 1px);
-    background-size:48px 48px;
-    mask-image:radial-gradient(ellipse 80% 60% at 50% 30%,#000 30%,transparent 100%);
+      radial-gradient(ellipse 80% 40% at 50% -10%, #0a2a5e55 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 60px, #0d346018 60px, #0d346018 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, #0d346018 60px, #0d346018 61px);
   }
 
-  a{color:inherit;text-decoration:none}
+  header {
+    text-align: center;
+    padding: 54px 20px 36px;
+    position: relative;
+  }
+  header::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--blue1), var(--cyan), transparent);
+    margin-top: 32px;
+  }
+  .site-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(2.4rem, 7vw, 5rem);
+    letter-spacing: 6px;
+    color: #fff;
+    text-shadow: 0 0 30px var(--cyan), 0 0 80px #0066ff88;
+    text-transform: uppercase;
+  }
+  .site-sub {
+    color: var(--cyan);
+    letter-spacing: 4px;
+    font-size: 0.95rem;
+    margin-top: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
 
-  /* ─── NAV ─── */
-  .nav{
-    position:sticky;top:0;z-index:50;
-    backdrop-filter:saturate(140%) blur(14px);
-    background:rgba(5,7,15,.65);
-    border-bottom:1px solid var(--line);
+  main {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
   }
-  .nav-inner{
-    max-width:1180px;margin:0 auto;
-    padding:16px 24px;
-    display:flex;align-items:center;justify-content:space-between;gap:16px;
-  }
-  .logo{
-    display:flex;align-items:center;gap:10px;
-    font-family:'Syncopate',sans-serif;font-weight:700;
-    letter-spacing:.22em;font-size:.85rem;
-  }
-  .logo-mark{
-    width:28px;height:28px;border-radius:8px;
-    background:var(--grad);
-    box-shadow:0 0 24px rgba(110,231,255,.5);
-  }
-  .nav-links{display:flex;gap:6px;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-  .nav-links a{padding:8px 14px;border-radius:999px;transition:.2s}
-  .nav-links a:hover{color:#fff;background:rgba(120,170,255,.08)}
-  .nav-cta{
-    font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;
-    padding:10px 18px;border-radius:999px;
-    background:var(--grad);color:#06091a;
-    box-shadow:0 8px 24px rgba(91,139,255,.35);
-    transition:transform .2s;
-  }
-  .nav-cta:hover{transform:translateY(-2px)}
-  @media(max-width:720px){.nav-links{display:none}}
 
-  /* ─── HERO ─── */
-  .hero{
-    max-width:1180px;margin:0 auto;
-    padding:80px 24px 56px;text-align:center;position:relative;
+  /* ── SECTION ── */
+  .shop-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px #00112b88, inset 0 1px 0 #1a5aaa33;
+    position: relative;
   }
-  .badge{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:6px 14px;border-radius:999px;
-    border:1px solid var(--line-strong);
-    background:rgba(13,20,38,.6);
-    font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;color:var(--cyan);
-    margin-bottom:24px;
+  .shop-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0a2a5e22 0%, transparent 60%);
+    pointer-events: none;
   }
-  .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);animation:pulse 1.8s infinite}
-  @keyframes pulse{50%{opacity:.4}}
-  .hero h1{
-    font-family:'Syncopate',sans-serif;
-    font-size:clamp(2.4rem,7vw,5.5rem);
-    line-height:1;letter-spacing:.02em;
-    background:linear-gradient(180deg,#fff 0%,#a9bee6 100%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    margin-bottom:18px;
-  }
-  .hero h1 .accent{
-    background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
-  }
-  .hero p{max-width:580px;margin:0 auto;color:var(--muted);font-size:1.05rem}
-  .hero-cta{
-    margin-top:32px;display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center;
-  }
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:14px 26px;border-radius:12px;font-weight:600;
-    font-size:.85rem;letter-spacing:.16em;text-transform:uppercase;
-    cursor:pointer;border:none;transition:.2s;
-  }
-  .btn-primary{background:var(--grad);color:#06091a;box-shadow:0 10px 30px rgba(91,139,255,.35)}
-  .btn-primary:hover{transform:translateY(-2px)}
-  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line-strong)}
-  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
 
-  /* ─── MAIN LAYOUT ─── */
-  main{max-width:1180px;margin:0 auto;padding:40px 24px 100px;display:flex;flex-direction:column;gap:80px}
+  .section-header {
+    padding: 28px 36px 22px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #0c2044 0%, #091830 100%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-icon { font-size: 2rem; }
+  .section-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: #fff;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px var(--blue2);
+  }
 
-  /* ─── SHOP SECTION ─── */
-  .shop{
-    border:1px solid var(--line);border-radius:24px;
-    background:linear-gradient(180deg,rgba(17,26,48,.6),rgba(10,15,31,.6));
-    padding:36px;position:relative;overflow:hidden;
-    box-shadow:0 30px 80px -30px rgba(0,0,0,.6);
-  }
-  .shop::before{
-    content:"";position:absolute;top:-1px;left:24px;right:24px;height:1px;
-    background:var(--grad);opacity:.6;
-  }
-  .shop-head{
-    display:flex;align-items:center;justify-content:space-between;
-    gap:16px;flex-wrap:wrap;margin-bottom:28px;
-  }
-  .shop-id{
-    display:flex;align-items:center;gap:16px;
-  }
-  .avatar{
-    width:56px;height:56px;border-radius:14px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.7rem;
-    background:linear-gradient(135deg,rgba(110,231,255,.15),rgba(167,139,250,.15));
-    border:1px solid var(--line-strong);
-  }
-  .shop-name{
-    font-family:'Syncopate',sans-serif;font-size:clamp(1.3rem,3vw,2rem);
-    letter-spacing:.1em;line-height:1;
-  }
-  .shop-tag{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-top:6px}
-  .shop-meta{
-    display:flex;gap:8px;flex-wrap:wrap;
-  }
-  .chip{
-    padding:6px 12px;border-radius:999px;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
-    border:1px solid var(--line-strong);color:var(--muted);background:rgba(13,20,38,.6);
-  }
-  .chip.live{color:var(--cyan);border-color:rgba(110,231,255,.35)}
-  .chip.live::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-right:6px;vertical-align:middle;box-shadow:0 0 10px var(--cyan)}
+  .section-body { padding: 32px 36px; display: flex; flex-direction: column; gap: 40px; }
 
-  /* ─── CATEGORY ─── */
-  .category{margin-top:36px}
-  .cat-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px}
-  .cat-title{
-    font-family:'Syncopate',sans-serif;font-size:1.1rem;letter-spacing:.18em;color:#fff;
-    display:flex;align-items:center;gap:10px;
+  /* ── CATEGORY LABEL ── */
+  .cat-label {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    letter-spacing: 3px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    text-shadow: 0 0 14px var(--cyan);
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .cat-title .num{
-    font-size:.7rem;color:var(--cyan);
-    border:1px solid rgba(110,231,255,.35);padding:2px 8px;border-radius:6px;letter-spacing:.2em;
+  .cat-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--cyan) 0%, transparent 100%);
+    opacity: 0.35;
   }
-  .cat-rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line-strong),transparent)}
-  .cat-info{color:var(--muted);font-size:.92rem;margin:8px 0 18px;max-width:720px}
 
-  /* ─── ITEM GRID ─── */
-  .grid{
-    display:grid;gap:16px;
-    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  .cat-info {
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.55;
+    font-style: italic;
+    border-left: 2px solid var(--blue1);
+    padding-left: 12px;
   }
-  .card{
-    position:relative;
-    border:1px solid var(--line);
-    border-radius:18px;
-    padding:22px 20px 20px;
-    background:linear-gradient(180deg,rgba(17,26,48,.85),rgba(10,15,31,.85));
-    display:flex;flex-direction:column;gap:12px;
-    transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
-    overflow:hidden;
-  }
-  .card::after{
-    content:"";position:absolute;inset:0;border-radius:18px;padding:1px;
-    background:var(--grad);
-    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor;mask-composite:exclude;
-    opacity:0;transition:opacity .25s;pointer-events:none;
-  }
-  .card:hover{transform:translateY(-4px);box-shadow:0 22px 50px -20px rgba(91,139,255,.35)}
-  .card:hover::after{opacity:1}
-  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-  .card-emoji{
-    width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-    background:rgba(110,231,255,.08);border:1px solid var(--line-strong);font-size:1.3rem;
-  }
-  .tag{
-    font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
-    padding:4px 10px;border-radius:999px;background:rgba(167,139,250,.12);color:var(--violet);
-    border:1px solid rgba(167,139,250,.3);
-  }
-  .item-name{font-size:1.05rem;font-weight:600;color:#fff;letter-spacing:.02em}
-  .item-desc{font-size:.88rem;color:var(--muted);line-height:1.55}
-  .price-row{display:flex;align-items:baseline;gap:10px;margin-top:4px}
-  .price-usd{font-family:'Syncopate',sans-serif;font-size:1.35rem;color:var(--gold);letter-spacing:.04em}
-  .price-rbx{font-size:.85rem;color:var(--cyan);font-weight:500}
-  .price-rbx::before{content:"·  ";color:var(--muted)}
-  .btn-buy{
-    margin-top:6px;
-    background:rgba(91,139,255,.12);
-    border:1px solid rgba(91,139,255,.35);
-    color:#fff;
-    padding:11px 14px;border-radius:10px;
-    font-family:'Space Grotesk',sans-serif;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;
-    cursor:pointer;transition:.2s;
-  }
-  .btn-buy:hover{background:var(--grad);color:#06091a;border-color:transparent}
 
-  /* ─── PAYMENTS ─── */
-  .payments{
-    margin-top:36px;
-    display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
-    padding:20px 24px;border-radius:16px;
-    border:1px solid var(--line);
-    background:linear-gradient(135deg,rgba(110,231,255,.05),rgba(167,139,250,.05));
+  /* ── ITEM GRID ── */
+  .item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 16px;
   }
-  .pay-label{font-family:'Syncopate',sans-serif;font-size:.85rem;letter-spacing:.22em;color:#fff}
-  .pay-chips{display:flex;flex-wrap:wrap;gap:8px}
-  .pay-chip{
-    padding:8px 14px;border-radius:10px;font-size:.8rem;font-weight:600;letter-spacing:.08em;
-    background:rgba(13,20,38,.8);border:1px solid var(--line-strong);color:#fff;
-    display:inline-flex;align-items:center;gap:8px;
-  }
-  .pay-chip .swatch{width:8px;height:8px;border-radius:50%}
 
-  /* ─── FOOTER ─── */
-  footer{
-    border-top:1px solid var(--line);padding:36px 24px;text-align:center;color:var(--muted);
-    font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;
+  .item-card {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
   }
-  footer .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+  .item-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue1), var(--cyan));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .item-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px #001a4488; border-color: #1a5aaa; }
+  .item-card:hover::before { opacity: 1; }
 
-  /* ─── MODAL ─── */
-  .modal-overlay{
-    display:none;position:fixed;inset:0;z-index:999;
-    background:rgba(2,4,12,.7);backdrop-filter:blur(10px);
-    align-items:center;justify-content:center;padding:20px;
+  .item-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #fff;
+    letter-spacing: 1px;
   }
-  .modal-overlay.open{display:flex}
-  .modal{
-    background:linear-gradient(180deg,#0e152a,#080d1c);
-    border:1px solid var(--line-strong);
-    border-radius:22px;max-width:460px;width:100%;
-    padding:32px;position:relative;
-    box-shadow:0 30px 80px rgba(91,139,255,.25),inset 0 1px 0 rgba(255,255,255,.05);
-    animation:popIn .25s cubic-bezier(.34,1.56,.64,1);
+  .item-price {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.35rem;
+    color: var(--gold);
+    letter-spacing: 1px;
   }
-  @keyframes popIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
-  .modal::before{
-    content:"";position:absolute;top:-1px;left:24px;right:24px;height:1px;background:var(--grad);
+  .item-price span { color: var(--cyan); font-size: 1.1rem; }
+  .item-desc {
+    font-size: 0.86rem;
+    color: var(--muted);
+    line-height: 1.5;
   }
-  .modal-close{
-    position:absolute;top:14px;right:16px;
-    width:32px;height:32px;border-radius:8px;
-    background:rgba(255,255,255,.04);border:1px solid var(--line);
-    color:var(--muted);font-size:1rem;cursor:pointer;transition:.2s;
-  }
-  .modal-close:hover{color:#fff;background:rgba(255,255,255,.08)}
-  .modal-eyebrow{font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px}
-  .modal-title{font-family:'Syncopate',sans-serif;font-size:1.3rem;letter-spacing:.1em;color:#fff;margin-bottom:6px}
-  .modal-sub{color:var(--muted);font-size:.9rem;margin-bottom:22px}
-  .modal-note{
-    background:rgba(110,231,255,.06);border:1px solid rgba(110,231,255,.2);
-    border-radius:10px;padding:12px 14px;font-size:.82rem;color:var(--text);margin-bottom:20px;line-height:1.55;
-  }
-  .pay-options{display:flex;flex-direction:column;gap:10px}
-  .pay-option{
-    display:flex;align-items:center;gap:14px;
-    padding:14px 16px;border-radius:12px;
-    background:rgba(13,20,38,.8);border:1px solid var(--line);
-    cursor:pointer;transition:.2s;
-  }
-  .pay-option:hover{border-color:var(--cyan);transform:translateX(2px)}
-  .pay-option .icon{
-    width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-    background:rgba(110,231,255,.1);border:1px solid var(--line-strong);font-size:1.2rem;
-  }
-  .pay-option .pay-name{font-weight:600;color:#fff;font-size:.95rem;letter-spacing:.04em}
-  .pay-option .pay-detail{font-size:.78rem;color:var(--muted);margin-top:2px}
-  .pay-option .arrow{margin-left:auto;color:var(--muted);transition:.2s}
-  .pay-option:hover .arrow{color:var(--cyan);transform:translateX(4px)}
 
-  @media(max-width:640px){
-    .shop{padding:24px 18px}
-    .payments{padding:16px}
+  /* ── BUY BUTTON ── */
+  .btn-buy {
+    margin-top: auto;
+    background: linear-gradient(135deg, var(--blue1), #005ccb);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 0;
+    width: 100%;
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.15s;
+    text-transform: uppercase;
+  }
+  .btn-buy:hover { filter: brightness(1.25); transform: scale(1.02); }
+
+  /* ── PAYMENTS BANNER ── */
+  .payments-bar {
+    background: linear-gradient(135deg, #051228, #091c3a);
+    border: 1px solid #0d3460;
+    border-radius: 14px;
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .pay-label {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.5rem;
+    color: var(--cyan);
+    letter-spacing: 3px;
+    text-shadow: 0 0 12px var(--cyan);
+    white-space: nowrap;
+  }
+  .pay-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pay-chip {
+    background: #0a2244;
+    border: 1px solid #1a5aaa;
+    border-radius: 30px;
+    padding: 7px 18px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #00000099;
+    backdrop-filter: blur(6px);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #071428;
+    border: 1px solid var(--cyan);
+    border-radius: 20px;
+    max-width: 480px;
+    width: 100%;
+    padding: 36px 32px 28px;
+    box-shadow: 0 0 60px #00d4ff44;
+    position: relative;
+    animation: popIn 0.22s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+  }
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 18px;
+    background: none; border: none;
+    color: var(--muted); font-size: 1.6rem; cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: #fff; }
+  .modal-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.7rem;
+    color: #fff;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .modal-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+  .modal-note {
+    background: #0d2040;
+    border: 1px solid #1a4a88;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.86rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.55;
+  }
+  .pay-options { display: flex; flex-direction: column; gap: 12px; }
+  .pay-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #0a1e3a;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .pay-option:hover { border-color: var(--cyan); background: #0d2848; }
+  .pay-icon { font-size: 1.6rem; }
+  .pay-name { font-weight: 700; color: #fff; font-size: 1rem; letter-spacing: 1px; }
+  .pay-detail { font-size: 0.83rem; color: var(--muted); }
+
+  footer {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid #0d3460;
+    letter-spacing: 1px;
+  }
+
+  @media(max-width:600px) {
+    .section-body { padding: 20px 18px; }
+    .section-header { padding: 20px 18px; }
+    .payments-bar { padding: 18px; }
   }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="#" class="logo"><span class="logo-mark"></span>The Shop</a>
-    <div class="nav-links">
-      <a href="#jroc">Jroc</a>
-      <a href="#hunt">Hunt</a>
-      <a href="#pay">Payments</a>
-    </div>
-    <a href="#jroc" class="nav-cta">Shop Now</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<header class="hero">
-  <div class="badge"><span class="dot"></span>Open · Taking orders now</div>
-  <h1>Custom gear,<br/><span class="accent">delivered fast.</span></h1>
-  <p>Roblox accessories, custom merch, full Discord server setups, and 24/7 bots — built by Jroc &amp; Hunt. Real prices, real people.</p>
-  <div class="hero-cta">
-    <a href="#jroc" class="btn btn-primary">Browse Items →</a>
-    <a href="#pay" class="btn btn-ghost">View Payments</a>
-  </div>
+<header>
+  <div class="site-title">🛒 The Shop</div>
+  <div class="site-sub">Official Store · Est. 2025</div>
 </header>
 
 <main>
 
-  <!-- ── JROC'S SHOP ── -->
-  <section class="shop" id="jroc">
-    <div class="shop-head">
-      <div class="shop-id">
-        <div class="avatar">👑</div>
-        <div>
-          <div class="shop-name">Jroc's Shop</div>
-          <div class="shop-tag">Accessories · Merch · Discord</div>
+  <!-- ══════════ JROC'S SHOP ══════════ -->
+  <section class="shop-section">
+    <div class="section-header">
+      <span class="section-icon">👑</span>
+      <h2 class="section-title">Jroc's Shop</h2>
+    </div>
+    <div class="section-body">
+
+      <!-- ACCESSORIES -->
+      <div>
+        <div class="cat-label">🎒 Accessories Prices</div>
+        <div class="item-grid">
+
+          <div class="item-card">
+            <div class="item-name">🧢 Beanies / Hats / Mask</div>
+            <div class="item-price">$5 <span>/ 350 Robux</span></div>
+            <div class="item-desc">When you buy this you pick what one you want — you don't get them all. 350 is just the price for each.</div>
+            <button class="btn-buy" onclick="openModal('Beanie / Hat / Mask', [
+              {icon:&quot;💰&quot;, name:&quot;PayPal&quot;, detail:&quot;paypal.me/JojoLikemoney&quot;, url:&quot;https://www.paypal.me/JojoLikemoney&quot;},
+              {icon:&quot;💵&quot;, name:&quot;Cash App&quot;, detail:&quot;$Jojogetzdabag&quot;, url:&quot;https://cash.app/$Jojogetzdabag&quot;},
+              {icon:&quot;🎮&quot;, name:&quot;Robux&quot;, detail:&quot;Roblox Game Pass Link&quot;, url:&quot;https://www.roblox.com/catalog/94810828366880/Beanie-hat-mask&quot;}
+            ], &quot;Want more than one? Make a ticket and let us know!&quot;)">Buy Now</button>
+          </div>
+
+          <div class="item-card">
+            <div class="item-name">🦸 Capes</div>
+            <div class="item-price">$3 <span>/ 250 Robux</span></div>
+            <div class="item-desc">Custom cape for your Roblox character. Stand out from the crowd.</div>
+            <button class="btn-buy" onclick="openModal('Cape', [
+              {icon:&quot;💰&quot;, name:&quot;PayPal&quot;, detail:&quot;paypal.me/JojoLikemoney&quot;, url:&quot;https://www.paypal.me/JojoLikemoney&quot;},
+              {icon:&quot;💵&quot;, name:&quot;Cash App&quot;, detail:&quot;$Jojogetzdabag&quot;, url:&quot;https://cash.app/$Jojogetzdabag&quot;},
+              {icon:&quot;🎮&quot;, name:&quot;Robux&quot;, detail:&quot;Roblox Game Pass Link&quot;, url:&quot;https://www.roblox.com/catalog/113375979182982/Cape&quot;}
+            ], &quot;Want more than one? Make a ticket and let us know!&quot;)">Buy Now</button>
+          </div>
+
+          <div class="item-card">
+            <div class="item-name">🎒 Backpacks</div>
+            <div class="item-price">$8 <span>/ 1k Robux</span></div>
+            <div class="item-desc">Custom backpack accessory for your avatar. Premium look.</div>
+            <button class="btn-buy" onclick="openModal('Backpack', [
+              {icon:&quot;💰&quot;, name:&quot;PayPal&quot;, detail:&quot;paypal.me/JojoLikemoney&quot;, url:&quot;https://www.paypal.me/JojoLikemoney&quot;},
+              {icon:&quot;💵&quot;, name:&quot;Cash App&quot;, detail:&quot;$Jojogetzdabag&quot;, url:&quot;https://cash.app/$Jojogetzdabag&quot;},
+              {icon:&quot;🎮&quot;, name:&quot;Robux&quot;, detail:&quot;Roblox Game Pass Link&quot;, url:&quot;https://www.roblox.com/catalog/80347796713979/Backpack&quot;}
+            ], &quot;Want more than one? Make a ticket and let us know!&quot;)">Buy Now</button>
+          </div>
+
+          <div class="item-card">
+            <div class="item-name">🦇 Bat</div>
+            <div class="item-price">Ask for Price</div>
+            <div class="item-desc">Bat accessory — contact us for pricing details.</div>
+            <button class="btn-buy" onclick="openModal('Bat', [
+              {icon:&quot;💰&quot;, name:&quot;PayPal&quot;, detail:&quot;paypal.me/JojoLikemoney&quot;, url:&quot;https://www.paypal.me/JojoLikemoney&quot;},
+              {icon:&quot;💵&quot;, name:&quot;Cash App&quot;, detail:&quot;$Jojogetzdabag&quot;, url:&quot;https://cash.app/$Jojogetzdabag&quot;},
+              {icon:&quot;🎮&quot;, name:&quot;Robux&quot;, detail:&quot;Roblox Game Pass Link&quot;, url:&quot;https://www.roblox.com/catalog/80136379271143/bat&quot;}
+            ], &quot;Want more than one? Make a ticket and let us know!&quot;)">Buy Now</button>
+          </div>
+
         </div>
       </div>
-      <div class="shop-meta">
-        <span class="chip live">Live</span>
-        <span class="chip">Verified Seller</span>
-      </div>
-    </div>
 
-    <!-- Accessories -->
-    <div class="category">
-      <div class="cat-head">
-        <div class="cat-title"><span class="num">01</span>🎒 Accessories</div>
-        <div class="cat-rule"></div>
-      </div>
-      <p class="cat-info">Per-item pricing — pick the one you want, you don't get them all.</p>
-      <div class="grid">
-        <article class="card">
-          <div class="card-top"><div class="card-emoji">🧢</div><span class="tag">Popular</span></div>
-          <div class="item-name">Beanies / Hats / Masks</div>
-          <div class="item-desc">Pick one style per purchase. Custom-fitted for your Roblox avatar.</div>
-          <div class="price-row"><span class="price-usd">$5</span><span class="price-rbx">350 Robux</span></div>
-          <button class="btn-buy" onclick="openModal()">Buy Now</button>
-        </article>
-        <article class="card">
-          <div class="card-top"><div class="card-emoji">🦸</div><span class="tag">Custom</span></div>
-          <div class="item-name">Capes</div>
-          <div class="item-desc">Custom-designed cape that drapes clean on any avatar. Stand out instantly.</div>
-          <div class="price-row"><span class="price-usd">$3</span><span class="price-rbx">250 Robux</span></div>
-          <button class="btn-buy" onclick="openModal()">Buy Now</button>
-        </article>
-        <article class="card">
-          <div class="card-top"><div class="card-emoji">🎒</div><span class="tag">Premium</span></div>
-          <div class="item-name">Backpacks</div>
-          <div class="item-desc">Premium custom backpack accessory. Multiple styles available on request.</div>
-          <div class="price-row"><span class="price-usd">$8</span><span class="price-rbx">1k Robux</span></div>
-          <button class="btn-buy" onclick="openModal()">Buy Now</button>
-        </article>
-        <article class="card">
-          <div class="card-top"><div class="card-emoji">🦇</div><span class="tag">Inquire</span></div>
-          <div class="item-name">Bat</div>
-          <div class="item-desc">Bat accessory — DM for current pricing and variants.</div>
-          <div class="price-row"><span class="price-usd">Ask</span><span class="price-rbx">Custom quote</span></div>
-          <button class="btn-buy" onclick="openModal()">Buy Now</button>
-        </article>
-      </div>
-    </div>
+      <!-- MERCH -->
+      <div>
+        <div class="cat-label">👕 Merch Prices</div>
+        <div class="cat-info">Custom gang merch, custom personal merch, and more — you name it, we make it.</div>
+        <div class="item-grid">
 
-    <!-- Merch -->
-    <div class="category">
-      <div class="cat-head">
-        <div class="cat-title"><span class="num">02</span>👕 Merch</div>
-        <div class="cat-rule"></div>
-      </div>
-      <p class="cat-info">Custom gang merch, personal merch, anything you can name — we make it.</p>
-      <div class="grid">
-        <article class="card">
-          <div class="card-top"><div class="card-emoji">👕</div><span class="tag">Starter</span></div>
-          <div class="item-name">1 Custom Outfit</div>
-          <div class="item-desc">One fully custom outfit. Want more? Open a ticket and tell us what you need.</div>
-          <div class="price-row"><span class="price-usd">$2</span><span class="price-rbx">150 Robux</span></div>
-          <button class="btn-buy" onclick="openModal()">Buy Now</button>
-        </article>
-      </div>
-    </div>
+          <div class="item-card">
+            <div class="item-name">👕 1 Outfit</div>
+            <div class="item-price">$2 <span>/ 150 Robux</span></div>
+            <div class="item-desc">One fully custom outfit. Want more than one? Make a ticket and tell us!</div>
+            <button class="btn-buy" onclick="openModal('1 Outfit', [
+              {icon:&quot;💰&quot;, name:&quot;PayPal&quot;, detail:&quot;paypal.me/JojoLikemoney&quot;, url:&quot;https://www.paypal.me/JojoLikemoney&quot;},
+              {icon:&quot;💵&quot;, name:&quot;Cash App&quot;, detail:&quot;$Jojogetzdabag&quot;, url:&quot;https://cash.app/$Jojogetzdabag&quot;},
+              {icon:&quot;🎮&quot;, name:&quot;Robux&quot;, detail:&quot;150 Robux Game Pass&quot;, url:&quot;https://www.roblox.com/catalog/99478620069848/150&quot;}
+            ], &quot;Want to buy more than one outfit? Make a ticket and let us know!&quot;)">Buy Now</button>
+          </div>
 
-    <!-- Discord -->
-    <div class="category">
-      <div class="cat-head">
-        <div class="cat-title"><span class="num">03</span>💬 Discord Servers</div>
-        <div class="cat-rule"></div>
+        </div>
       </div>
-      <p class="cat-info">Full custom server setup — bots, roles, channels, colors, gang name. Includes 2 GFX &amp; 2 outfits for just $8.</p>
-      <div class="grid">
-        <article class="card">
-          <div class="card-top"><div class="card-emoji">🖥️</div><span class="tag">Best value</span></div>
-          <div class="item-name">Custom Discord Server</div>
-          <div class="item-desc">Full setup — bots, roles, channels, colors, gang name. Includes 2 GFX &amp; 2 outfits.</div>
-          <div class="price-row"><span class="price-usd">$8</span><span class="price-rbx">Each</span></div>
-          <button class="btn-buy" onclick="openModal()">Buy Now</button>
-        </article>
-      </div>
-    </div>
 
-    <!-- Payments -->
-    <div class="payments" id="pay">
-      <div class="pay-label">Payments Accepted</div>
-      <div class="pay-chips">
-        <span class="pay-chip"><span class="swatch" style="background:#00b06f"></span>Robux</span>
-        <span class="pay-chip"><span class="swatch" style="background:#00d54b"></span>Cash App</span>
-        <span class="pay-chip"><span class="swatch" style="background:#0070ba"></span>PayPal</span>
+      <!-- DISCORD SERVERS -->
+      <div>
+        <div class="cat-label">💬 Discord Servers Prices</div>
+        <div class="cat-info">Custom made Discord server — I set up bots, everything, for a good Discord gang or whatever type of server you want. You pick the gang name, colors, etc. Includes 2 GFX + 2 outfits for just $8!</div>
+        <div class="item-grid">
+
+          <div class="item-card">
+            <div class="item-name">🖥️ Custom Discord Server</div>
+            <div class="item-price">$8 <span>each</span></div>
+            <div class="item-desc">Full custom server setup — bots, roles, channels, colors, gang name. Includes 2 GFX & 2 outfits.</div>
+            <button class="btn-buy" onclick="openModal('Custom Discord Server', [
+              {icon:&quot;💰&quot;, name:&quot;PayPal&quot;, detail:&quot;paypal.me/JojoLikemoney&quot;, url:&quot;https://www.paypal.me/JojoLikemoney&quot;},
+              {icon:&quot;💵&quot;, name:&quot;Cash App&quot;, detail:&quot;$Jojogetzdabag&quot;, url:&quot;https://cash.app/$Jojogetzdabag&quot;}
+            ], &quot;Want more than one server? Make a ticket and let us know!&quot;)">Buy Now</button>
+          </div>
+
+        </div>
       </div>
+
+      <!-- PAYMENTS -->
+      <div class="payments-bar">
+        <div class="pay-label">💳 Payments</div>
+        <div class="pay-chips">
+          <div class="pay-chip">Robux</div>
+          <div class="pay-chip">Cash App</div>
+          <div class="pay-chip">PayPal</div>
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <!-- ── HUNT'S SHOP ── -->
-  <section class="shop" id="hunt">
-    <div class="shop-head">
-      <div class="shop-id">
-        <div class="avatar">🤖</div>
-        <div>
-          <div class="shop-name">Hunt's Shop</div>
-          <div class="shop-tag">Custom Discord Bots · 24/7</div>
+  <!-- ══════════ HUNT'S SHOP ══════════ -->
+  <section class="shop-section">
+    <div class="section-header">
+      <span class="section-icon">🤖</span>
+      <h2 class="section-title">Hunt's Shop</h2>
+    </div>
+    <div class="section-body">
+
+      <div>
+        <div class="cat-label">🤖 Discord Custom Bot</div>
+        <div class="cat-info">24/7 gang Discord bot — giveaway bot, mod bot, log bot, welcome bot, ticket system bot & more. Can pay with Nitro. Seller: <strong style="color:#fff">! Hunt</strong></div>
+        <div class="item-grid">
+
+          <div class="item-card">
+            <div class="item-name">🤖 Custom Discord Bot</div>
+            <div class="item-price">$5 <span>/ month</span></div>
+            <div class="item-desc">24/7 custom bot — giveaway, mod, log, welcome, ticket system & more. Can pay with Nitro!</div>
+            <button class="btn-buy" onclick="openModal('Custom Discord Bot', [
+              {icon:&quot;💰&quot;, name:&quot;PayPal&quot;, detail:&quot;paypal.com/paypalme/HuntPPL&quot;, url:&quot;https://www.paypal.com/paypalme/HuntPPL&quot;}
+            ], &quot;&quot;)">Buy Now</button>
+          </div>
+
         </div>
       </div>
-      <div class="shop-meta">
-        <span class="chip live">Live</span>
-        <span class="chip">Seller: ! Hunt</span>
-      </div>
-    </div>
 
-    <div class="category">
-      <div class="cat-head">
-        <div class="cat-title"><span class="num">01</span>🤖 Discord Bots</div>
-        <div class="cat-rule"></div>
+      <div class="payments-bar">
+        <div class="pay-label">💳 Payment</div>
+        <div class="pay-chips">
+          <div class="pay-chip">PayPal</div>
+          <div class="pay-chip">Nitro</div>
+        </div>
       </div>
-      <p class="cat-info">24/7 gang Discord bot — giveaways, moderation, logs, welcomes, tickets &amp; more. Nitro accepted.</p>
-      <div class="grid">
-        <article class="card">
-          <div class="card-top"><div class="card-emoji">🤖</div><span class="tag">Subscription</span></div>
-          <div class="item-name">Custom Discord Bot</div>
-          <div class="item-desc">24/7 custom bot — giveaway, mod, log, welcome, ticket system &amp; more. Pay with Nitro!</div>
-          <div class="price-row"><span class="price-usd">$5</span><span class="price-rbx">per month</span></div>
-          <button class="btn-buy" onclick="openModal()">Buy Now</button>
-        </article>
-      </div>
-    </div>
 
-    <div class="payments">
-      <div class="pay-label">Payments Accepted</div>
-      <div class="pay-chips">
-        <span class="pay-chip"><span class="swatch" style="background:#0070ba"></span>PayPal</span>
-        <span class="pay-chip"><span class="swatch" style="background:#a78bfa"></span>Discord Nitro</span>
-      </div>
     </div>
   </section>
 
 </main>
 
-<footer>© 2025 <span class="grad">The Shop</span> · All Rights Reserved</footer>
+<footer>© 2025 The Shop · All Rights Reserved</footer>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+<!-- ══════════ NOTICE POPUP ══════════ -->
+<div class="modal-overlay open" id="notice-modal">
+  <div class="modal" style="text-align:center; max-width:420px;">
+    <div class="modal-title" style="font-size:1.4rem; margin-bottom:14px;">📸 Important Notice</div>
+    <div style="color:var(--text); font-size:1.05rem; line-height:1.65; margin-bottom:24px;">
+      Make sure to <strong style="color:var(--cyan)">screenshot your purchase</strong> after buying on website and make a <strong style="color:var(--cyan)">ticket in server</strong> n show proof and i will get to you
+    </div>
+    <button class="btn-buy" style="max-width:200px; margin:0 auto;" onclick="closeNotice()">Got It ✓</button>
+  </div>
+</div>
+
+<!-- ══════════ MODAL ══════════ -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-eyebrow">Checkout</div>
-    <div class="modal-title">Choose Payment</div>
-    <div class="modal-sub">Pick a method below and we'll DM you to confirm.</div>
-    <div class="modal-note">Make a ticket in the Discord server after paying so we can deliver fast.</div>
-    <div class="pay-options">
-      <a class="pay-option"><div class="icon">💵</div><div><div class="pay-name">Cash App</div><div class="pay-detail">Instant · USD</div></div><span class="arrow">→</span></a>
-      <a class="pay-option"><div class="icon">🅿️</div><div><div class="pay-name">PayPal</div><div class="pay-detail">Goods &amp; services</div></div><span class="arrow">→</span></a>
-      <a class="pay-option"><div class="icon">🟦</div><div><div class="pay-name">Robux</div><div class="pay-detail">Via group payout</div></div><span class="arrow">→</span></a>
-      <a class="pay-option"><div class="icon">💜</div><div><div class="pay-name">Discord Nitro</div><div class="pay-detail">For bot subs only</div></div><span class="arrow">→</span></a>
-    </div>
+    <div class="modal-title" id="modal-title">Buy Item</div>
+    <div class="modal-sub">Choose your payment method below</div>
+    <div class="modal-note" id="modal-note"></div>
+    <div class="pay-options" id="modal-options"></div>
   </div>
 </div>
 
 <script>
-  function openModal(){document.getElementById('modal').classList.add('open');document.body.style.overflow='hidden'}
-  function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow=''}
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+  function closeNotice() {
+    document.getElementById('notice-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function openModal(itemName, options, note) {
+    document.getElementById('modal-title').textContent = '🛒 Buy — ' + itemName;
+    const noteEl = document.getElementById('modal-note');
+    if (note) {
+      noteEl.textContent = '📌 ' + note;
+      noteEl.style.display = 'block';
+    } else {
+      noteEl.style.display = 'none';
+    }
+    const optionsEl = document.getElementById('modal-options');
+    optionsEl.innerHTML = '';
+    options.forEach(opt => {
+      const a = document.createElement('a');
+      a.href = opt.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = 'pay-option';
+      a.innerHTML = `
+        <span class="pay-icon">${opt.icon}</span>
+        <div>
+          <div class="pay-name">${opt.name}</div>
+          <div class="pay-detail">${opt.detail}</div>
+        </div>
+      `;
+      optionsEl.appendChild(a);
+    });
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modal')) closeModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 </body>
 </html>
