@@ -489,6 +489,17 @@
 
 <footer>© 2025 The Shop · All Rights Reserved</footer>
 
+<!-- ══════════ NOTICE POPUP ══════════ -->
+<div class="modal-overlay open" id="notice-modal">
+  <div class="modal" style="text-align:center; max-width:420px;">
+    <div class="modal-title" style="font-size:1.4rem; margin-bottom:14px;">📸 Important Notice</div>
+    <div style="color:var(--text); font-size:1.05rem; line-height:1.65; margin-bottom:24px;">
+      Make sure to <strong style="color:var(--cyan)">screenshot your purchase</strong> after buying on website and make a <strong style="color:var(--cyan)">ticket in server</strong> n show proof and i will get to you
+    </div>
+    <button class="btn-buy" style="max-width:200px; margin:0 auto;" onclick="closeNotice()">Got It ✓</button>
+  </div>
+</div>
+
 <!-- ══════════ MODAL ══════════ -->
 <div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
   <div class="modal">
@@ -501,6 +512,11 @@
 </div>
 
 <script>
+  function closeNotice() {
+    document.getElementById('notice-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
   function openModal(itemName, options, note) {
     document.getElementById('modal-title').textContent = '🛒 Buy — ' + itemName;
     const noteEl = document.getElementById('modal-note');
