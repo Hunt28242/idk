@@ -737,19 +737,22 @@
   }
 
   .amount-pick {
-    flex: 1;
-    min-width: 80px;
-    padding: 12px;
+    flex: 1 1 120px;
+    min-width: 0;
+    padding: 12px 8px;
     background: var(--card2);
     border: 2px solid rgba(255,215,0,0.2);
     border-radius: 6px;
     color: var(--muted);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
-    letter-spacing: 2px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
     cursor: pointer;
     text-align: center;
     transition: all 0.2s;
+    word-break: break-word;
+    line-height: 1.3;
   }
 
   .amount-pick:hover, .amount-pick.selected {
@@ -987,11 +990,12 @@
       <div class="coupon-form">
         <label for="couponPw">Password</label>
         <input type="password" id="couponPw" placeholder="Enter code..." autocomplete="off">
-        <label>Coupon Amount</label>
+        <label>Coupon Type (Item it applies to)</label>
         <div class="amount-picks">
-          <button class="amount-pick" onclick="selectAmount(this, 5)">$5</button>
-          <button class="amount-pick" onclick="selectAmount(this, 10)">$10</button>
-          <button class="amount-pick" onclick="selectAmount(this, 20)">$20</button>
+          <button class="amount-pick" onclick="selectAmount(this, 'Beanies / Hats / Masks', 5)">Beanies / Hats / Masks</button>
+          <button class="amount-pick" onclick="selectAmount(this, 'Capes', 10)">Capes</button>
+          <button class="amount-pick" onclick="selectAmount(this, 'Backpacks', 20)">Backpacks</button>
+          <button class="amount-pick" onclick="selectAmount(this, 'Custom Outfit', 2)">Custom Outfit</button>
         </div>
         <button class="gen-btn" onclick="generateCoupon()">Generate Coupon</button>
         <div id="couponError"></div>
@@ -1012,7 +1016,7 @@
     <div class="section-header">
       <h2>Hunt's Shop</h2>
       <div class="sub">
-        <img src="https://cdn.discordapp.com/attachments/1508764129308180586/1510342084744183971/JDOT.png?ex=6a1c772d&is=6a1b25ad&hm=ec07713454c2ee6afc7a93f517e1fb276791759741fb0737cedadf6b373d5bb2&" alt="logo" class="sub-logo" onerror="this.style.display:'none'">
+        <img src="https://cdn.discordapp.com/attachments/1508764129308180586/1510342084744183971/JDOT.png?ex=6a1c772d&is=6a1b25ad&hm=ec07713454c2ee6afc7a93f517e1fb276791759741fb0737cedadf6b373d5bb2&" alt="logo" class="sub-logo" onerror="this.style.display='none'">
         Custom Discord Bots · 24/7 Service
       </div>
     </div>
@@ -1128,201 +1132,148 @@
 </div>
 
 <script>
-  // ── LOGO URL ──
-  const LOGO = 'https://cdn.discordapp.com/attachments/1508764129308180586/1510342084744183971/JDOT.png?ex=6a1c772d&is=6a1b25ad&hm=ec07713454c2ee6afc7a93f517e1fb276791759741fb0737cedadf6b373d5bb2&';
+  const LOGO = "https://cdn.discordapp.com/attachments/1508764129308180586/1510342084744183971/JDOT.png?ex=6a1c772d&is=6a1b25ad&hm=ec07713454c2ee6afc7a93f517e1fb276791759741fb0737cedadf6b373d5bb2&";
 
-  // ── COUPON STORE ──
-  // { code: { amount, used } }
-  const couponStore = {};
+  const STORE_KEY = "jroc_coupons_v1";
+  function loadStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e) { return {}; } }
+  function saveStore(store) { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch(e) {} }
 
-  // ── SEARCH ──
   function handleSearch(val) {
     const q = val.trim().toLowerCase();
-    const banner = document.getElementById('searchBanner');
-    const allCards = document.querySelectorAll('[data-searchable]');
-
-    if (!q) {
-      allCards.forEach(c => c.classList.remove('search-hidden'));
-      banner.style.display = 'none';
-      return;
-    }
-
-    // Show jroc section so results appear
-    document.querySelectorAll('.shop-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('jroc').classList.add('active');
-    document.querySelectorAll('.nav-tab')[0].classList.add('active');
-
+    const banner = document.getElementById("searchBanner");
+    const allCards = document.querySelectorAll("[data-searchable]");
+    if (!q) { allCards.forEach(c => c.classList.remove("search-hidden")); banner.style.display = "none"; return; }
+    document.querySelectorAll(".shop-section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+    document.getElementById("jroc").classList.add("active");
+    document.querySelectorAll(".nav-tab")[0].classList.add("active");
     let found = 0;
     allCards.forEach(card => {
-      const kw = (card.dataset.keywords || '') + ' ' + (card.querySelector('h3')?.textContent || '');
-      if (kw.toLowerCase().includes(q)) {
-        card.classList.remove('search-hidden');
-        found++;
-      } else {
-        card.classList.add('search-hidden');
-      }
+      const h = card.querySelector("h3");
+      const kw = (card.dataset.keywords || "") + " " + (h ? h.textContent : "");
+      if (kw.toLowerCase().includes(q)) { card.classList.remove("search-hidden"); found++; }
+      else { card.classList.add("search-hidden"); }
     });
-
-    banner.style.display = 'block';
-    banner.textContent = found > 0
-      ? `Showing ${found} result${found !== 1 ? 's' : ''} for "${val}"`
-      : `No results found for "${val}"`;
+    banner.style.display = "block";
+    banner.textContent = found > 0 ? ("Showing " + found + " result" + (found !== 1 ? "s" : "") + " for \"" + val + "\"") : ("No results found for \"" + val + "\"");
   }
 
-  // ── NAV ──
   function showSection(id, tabEl) {
-    document.querySelectorAll('.shop-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    if (tabEl) tabEl.classList.add('active');
-    // clear search
-    document.getElementById('searchInput').value = '';
-    document.querySelectorAll('[data-searchable]').forEach(c => c.classList.remove('search-hidden'));
-    document.getElementById('searchBanner').style.display = 'none';
+    document.querySelectorAll(".shop-section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    if (tabEl) tabEl.classList.add("active");
+    document.getElementById("searchInput").value = "";
+    document.querySelectorAll("[data-searchable]").forEach(c => c.classList.remove("search-hidden"));
+    document.getElementById("searchBanner").style.display = "none";
   }
 
-  // ── MODAL ──
-  let currentModalType = '';
+  function buildLi() {
+    var img = document.createElement("img");
+    img.src = LOGO;
+    img.alt = "";
+    img.className = "pay-logo";
+    img.onerror = function() { this.style.display = "none"; };
+    return img.outerHTML;
+  }
 
   function openModal(itemName, price, type) {
-    currentModalType = type;
-    document.getElementById('modalItemName').textContent = itemName + ' — ' + price;
-    const opts = document.getElementById('modalPayOptions');
-    const note = document.getElementById('modalNote');
-    const couponEntry = document.getElementById('couponEntry');
-    opts.innerHTML = '';
-    note.style.display = 'none';
-    couponEntry.style.display = 'none';
-    document.getElementById('couponCodeInput').value = '';
-    document.getElementById('couponResult').style.display = 'none';
+    document.getElementById("modalItemName").textContent = itemName + " — " + price;
+    var opts = document.getElementById("modalPayOptions");
+    var note = document.getElementById("modalNote");
+    var couponEntry = document.getElementById("couponEntry");
+    opts.innerHTML = "";
+    note.style.display = "none";
+    couponEntry.style.display = "none";
+    document.getElementById("couponCodeInput").value = "";
+    document.getElementById("couponResult").style.display = "none";
 
-    const logoImg = `<img src="${LOGO}" alt="" class="pay-logo" onerror="this.style.display='none'">`;
+    var li = buildLi();
+    var paypal  = "<a href=\"https://www.paypal.me/JojoLikemoney\" target=\"_blank\" class=\"pay-btn paypal\">" + li + " PayPal — paypal.me/JojoLikemoney</a>";
+    var cashapp = "<a href=\"https://cash.app/$Jojogetzdabag\" target=\"_blank\" class=\"pay-btn cashapp\">" + li + " Cash App — $Jojogetzdabag</a>";
+    var couponBtn = "<button class=\"pay-btn coupon-btn\" onclick=\"toggleCouponEntry()\">" + li + " Pay With A Coupon</button>";
+    var rBase = "<a href=\"{URL}\" target=\"_blank\" class=\"pay-btn robux\">" + li + " {LABEL}</a>";
 
-    const paypalBtn  = `<a href="https://www.paypal.me/JojoLikemoney" target="_blank" class="pay-btn paypal">${logoImg} PayPal — paypal.me/JojoLikemoney</a>`;
-    const cashappBtn = `<a href="https://cash.app/$Jojogetzdabag" target="_blank" class="pay-btn cashapp">${logoImg} Cash App — $Jojogetzdabag</a>`;
-    const couponBtnHTML = `<button class="pay-btn coupon-btn" onclick="toggleCouponEntry()">${logoImg} Pay With A Coupon</button>`;
-
-    if (type === 'accessory') {
-      opts.innerHTML = paypalBtn + cashappBtn +
-        `<a href="https://www.roblox.com/catalog/94810828366880/Beanie-hat-mask" target="_blank" class="pay-btn robux">${logoImg} Robux — Buy on Roblox (350 R$)</a>` +
-        couponBtnHTML;
-      note.style.display = 'block';
-      note.textContent = 'When you buy you pick which item you want — you don\'t get all three. 350 R$ is the price per each item.';
-    } else if (type === 'cape') {
-      opts.innerHTML = paypalBtn + cashappBtn +
-        `<a href="https://www.roblox.com/catalog/113375979182982/Cape" target="_blank" class="pay-btn robux">${logoImg} Robux — Buy Cape on Roblox (250 R$)</a>` +
-        couponBtnHTML;
-    } else if (type === 'backpack') {
-      opts.innerHTML = paypalBtn + cashappBtn +
-        `<a href="https://www.roblox.com/catalog/80347796713979/Backpack" target="_blank" class="pay-btn robux">${logoImg} Robux — Buy Backpack on Roblox (1k R$)</a>` +
-        couponBtnHTML;
-    } else if (type === 'outfit') {
-      opts.innerHTML = paypalBtn + cashappBtn +
-        `<a href="https://www.roblox.com/catalog/99478620069848/150" target="_blank" class="pay-btn robux">${logoImg} Robux — Outfit Pass (150 R$)</a>` +
-        couponBtnHTML;
-      note.style.display = 'block';
-      note.textContent = 'Want more than one outfit? Make a ticket and tell us!';
-    } else if (type === 'discord') {
-      opts.innerHTML = paypalBtn + cashappBtn + couponBtnHTML;
-      note.style.display = 'block';
-      note.textContent = 'After payment, reach out with your gang name, colors, and theme so we can get started on your server + 2 GFX + 2 outfits!';
+    if (type === "accessory") {
+      opts.innerHTML = paypal + cashapp + rBase.replace("{URL}","https://www.roblox.com/catalog/94810828366880/Beanie-hat-mask").replace("{LABEL}","Robux — Buy on Roblox (350 R$)") + couponBtn;
+      note.style.display = "block"; note.textContent = "When you buy you pick which item you want — you don't get all three. 350 R$ is the price per each item.";
+    } else if (type === "cape") {
+      opts.innerHTML = paypal + cashapp + rBase.replace("{URL}","https://www.roblox.com/catalog/113375979182982/Cape").replace("{LABEL}","Robux — Buy Cape on Roblox (250 R$)") + couponBtn;
+    } else if (type === "backpack") {
+      opts.innerHTML = paypal + cashapp + rBase.replace("{URL}","https://www.roblox.com/catalog/80347796713979/Backpack").replace("{LABEL}","Robux — Buy Backpack on Roblox (1k R$)") + couponBtn;
+    } else if (type === "outfit") {
+      opts.innerHTML = paypal + cashapp + rBase.replace("{URL}","https://www.roblox.com/catalog/99478620069848/150").replace("{LABEL}","Robux — Outfit Pass (150 R$)") + couponBtn;
+      note.style.display = "block"; note.textContent = "Want more than one outfit? Make a ticket and tell us!";
+    } else if (type === "discord") {
+      opts.innerHTML = paypal + cashapp;
+      note.style.display = "block"; note.textContent = "After payment, reach out with your gang name, colors, and theme so we can get started on your server + 2 GFX + 2 outfits!";
     }
-
-    document.getElementById('payModal').classList.add('open');
+    document.getElementById("payModal").classList.add("open");
   }
 
   function toggleCouponEntry() {
-    const entry = document.getElementById('couponEntry');
-    entry.style.display = entry.style.display === 'block' ? 'none' : 'block';
-    document.getElementById('couponResult').style.display = 'none';
+    var entry = document.getElementById("couponEntry");
+    entry.style.display = entry.style.display === "block" ? "none" : "block";
+    document.getElementById("couponResult").style.display = "none";
   }
 
   function applyCoupon() {
-    const input = document.getElementById('couponCodeInput').value.trim().toUpperCase();
-    const result = document.getElementById('couponResult');
-    result.style.display = 'block';
-
-    if (!input) {
-      result.className = 'fail';
-      result.textContent = 'Please enter a coupon code.';
-      return;
-    }
-
-    if (!couponStore[input]) {
-      result.className = 'fail';
-      result.textContent = 'Invalid coupon code. Please check and try again.';
-      return;
-    }
-
-    if (couponStore[input].used) {
-      result.className = 'fail';
-      result.textContent = 'This coupon has already been used.';
-      return;
-    }
-
-    couponStore[input].used = true;
-    result.className = 'success';
-    result.textContent = `Coupon applied! $${couponStore[input].amount} off. Show this screen to Jroc to confirm your order.`;
+    var input = document.getElementById("couponCodeInput").value.trim().toUpperCase();
+    var result = document.getElementById("couponResult");
+    result.style.display = "block";
+    if (!input) { result.className = "fail"; result.textContent = "Please enter a coupon code."; return; }
+    var store = loadStore();
+    if (!store[input]) { result.className = "fail"; result.textContent = "Invalid coupon code. Please check and try again."; return; }
+    if (store[input].used) { result.className = "fail"; result.textContent = "This coupon has already been used."; return; }
+    store[input].used = true;
+    saveStore(store);
+    result.className = "success";
+    result.textContent = "Coupon applied! " + store[input].label + " — " + store[input].amount + " off. Show this screen to Jroc to confirm your order.";
   }
 
-  function closeModal() {
-    document.getElementById('payModal').classList.remove('open');
-  }
+  function closeModal() { document.getElementById("payModal").classList.remove("open"); }
+  document.getElementById("payModal").addEventListener("click", function(e) { if (e.target === this) closeModal(); });
 
-  document.getElementById('payModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
+  var selectedAmount = null;
+  var selectedLabel = null;
 
-  // ── COUPON GENERATOR ──
-  let selectedAmount = null;
-
-  function selectAmount(el, amt) {
-    document.querySelectorAll('.amount-pick').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
+  function selectAmount(el, label, amt) {
+    document.querySelectorAll(".amount-pick").forEach(function(b) { b.classList.remove("selected"); });
+    el.classList.add("selected");
     selectedAmount = amt;
+    selectedLabel = label;
   }
 
   function generateCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    const seg = () => Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-    return `${seg()}-${seg()}-${seg()}`;
+    var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    var seg = function() { return Array.from({length: 4}, function() { return chars[Math.floor(Math.random() * chars.length)]; }).join(""); };
+    return seg() + "-" + seg() + "-" + seg();
   }
 
   function generateCoupon() {
-    const pw = document.getElementById('couponPw').value;
-    const errEl = document.getElementById('couponError');
-    const output = document.getElementById('couponOutput');
-    errEl.style.display = 'none';
-    output.style.display = 'none';
-
-    if (pw !== 'JrocCode') {
-      errEl.style.display = 'block';
-      errEl.textContent = 'Incorrect password. Access denied.';
-      return;
-    }
-
-    if (!selectedAmount) {
-      errEl.style.display = 'block';
-      errEl.textContent = 'Please select a coupon amount ($5, $10, or $20).';
-      return;
-    }
-
-    const code = generateCode();
-    couponStore[code] = { amount: selectedAmount, used: false };
-
-    document.getElementById('generatedCode').textContent = code;
-    document.getElementById('generatedAmount').textContent = `Value: $${selectedAmount} OFF`;
-    output.style.display = 'block';
-    document.getElementById('couponPw').value = '';
+    var pw = document.getElementById("couponPw").value;
+    var errEl = document.getElementById("couponError");
+    var output = document.getElementById("couponOutput");
+    errEl.style.display = "none";
+    output.style.display = "none";
+    if (pw !== "JrocCode") { errEl.style.display = "block"; errEl.textContent = "Incorrect password. Access denied."; return; }
+    if (!selectedAmount || !selectedLabel) { errEl.style.display = "block"; errEl.textContent = "Please select a coupon type."; return; }
+    var code = generateCode();
+    var store = loadStore();
+    store[code] = { amount: selectedAmount, label: selectedLabel, used: false };
+    saveStore(store);
+    document.getElementById("generatedCode").textContent = code;
+    document.getElementById("generatedAmount").textContent = selectedLabel + " — " + selectedAmount + " OFF";
+    output.style.display = "block";
+    document.getElementById("couponPw").value = "";
   }
 
   function copyCode() {
-    const code = document.getElementById('generatedCode').textContent;
-    navigator.clipboard.writeText(code).then(() => {
-      const btn = document.querySelector('.copy-code-btn');
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy Code', 1800);
+    var code = document.getElementById("generatedCode").textContent;
+    navigator.clipboard.writeText(code).then(function() {
+      var btn = document.querySelector(".copy-code-btn");
+      btn.textContent = "Copied!";
+      setTimeout(function() { btn.textContent = "Copy Code"; }, 1800);
     });
   }
 </script>
