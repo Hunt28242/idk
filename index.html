@@ -1004,8 +1004,46 @@
         <div class="coupon-code-label">Your Coupon Code</div>
         <div class="coupon-code" id="generatedCode"></div>
         <div class="coupon-amount" id="generatedAmount"></div>
-        <div class="coupon-note">Valid on Jroc's Shop only · Cannot be used on Hunt's Shop</div>
+        <div class="coupon-note">Valid on Jroc's Shop only · One use · Anyone with this code can redeem it once</div>
+        <div id="cloudNote" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(255,100,0,0.1);border:1px solid rgba(255,100,0,0.4);border-radius:4px;color:#ff9944;font-size:0.78rem;letter-spacing:1px;">⚠️ No cloud URL set — code only works on this browser. See Setup Guide below to enable giveaways.</div>
         <button class="copy-code-btn" onclick="copyCode()">Copy Code</button>
+      </div>
+    </div>
+
+
+    <!-- SETUP GUIDE -->
+    <div style="margin-top:20px;">
+      <button onclick="toggleSetup()" style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.3);color:var(--muted);padding:8px 18px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:0.85rem;letter-spacing:2px;cursor:pointer;text-transform:uppercase;">Setup Cloud Coupons Guide</button>
+      <div id="setupPanel" style="display:none;margin-top:14px;padding:20px;background:rgba(0,20,60,0.5);border:1px solid rgba(0,102,255,0.2);border-radius:8px;font-size:0.85rem;line-height:1.7;color:var(--muted);">
+        <div style="color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;margin-bottom:12px;">One-Time Cloud Setup (Free)</div>
+        <b style="color:#fff;">Step 1:</b> Go to <a href="https://script.google.com" target="_blank" style="color:var(--accent);">script.google.com</a> → New Project<br>
+        <b style="color:#fff;">Step 2:</b> Delete everything and paste this code:<br>
+        <pre style="margin:10px 0;padding:12px;background:#020b18;border:1px solid rgba(0,102,255,0.2);border-radius:4px;color:#00ccff;font-size:0.75rem;overflow-x:auto;white-space:pre-wrap;">const SHEET_KEY = "jroc_coupons";
+function doGet(e) {
+  var props = PropertiesService.getScriptProperties();
+  var action = e.parameter.action;
+  var code = (e.parameter.code || "").toUpperCase();
+  if (action === "create") {
+    var obj = { label: e.parameter.label, amount: e.parameter.amount, used: false };
+    props.setProperty(code, JSON.stringify(obj));
+    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+  }
+  if (action === "redeem") {
+    var raw = props.getProperty(code);
+    if (!raw) return ContentService.createTextOutput(JSON.stringify({ok:false,error:"invalid"})).setMimeType(ContentService.MimeType.JSON);
+    var data = JSON.parse(raw);
+    if (data.used) return ContentService.createTextOutput(JSON.stringify({ok:false,error:"used"})).setMimeType(ContentService.MimeType.JSON);
+    data.used = true;
+    props.setProperty(code, JSON.stringify(data));
+    return ContentService.createTextOutput(JSON.stringify({ok:true,label:data.label,amount:data.amount})).setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput(JSON.stringify({ok:false,error:"unknown action"})).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+        <b style="color:#fff;">Step 3:</b> Click Deploy → New Deployment → Web App<br>
+        &nbsp;&nbsp;&nbsp;• Execute as: <b style="color:#fff;">Me</b><br>
+        &nbsp;&nbsp;&nbsp;• Who has access: <b style="color:#fff;">Anyone</b><br>
+        <b style="color:#fff;">Step 4:</b> Copy the Web App URL<br>
+        <b style="color:#fff;">Step 5:</b> Open index.html in a text editor, find <code style="color:#ff9944;">const APPS_SCRIPT_URL = "";</code> and paste your URL inside the quotes. Save and re-upload.
       </div>
     </div>
 
@@ -1134,9 +1172,53 @@
 <script>
   const LOGO = "https://cdn.discordapp.com/attachments/1508764129308180586/1510342084744183971/JDOT.png?ex=6a1c772d&is=6a1b25ad&hm=ec07713454c2ee6afc7a93f517e1fb276791759741fb0737cedadf6b373d5bb2&";
 
+  // ── COUPON STORE ──
+  // Coupons are stored in a shared object encoded in the page itself.
+  // When Jroc generates a code, it gets saved to a Google Apps Script Web App
+  // (free permanent cloud backend). Everyone who has the code can try it,
+  // but only the first person to redeem it succeeds.
+  //  
+  // SETUP INSTRUCTIONS (one time):
+  // 1. Go to script.google.com → New Project
+  // 2. Paste the Apps Script code shown in the setup panel below
+  // 3. Deploy → New deployment → Web app → Execute as: Me, Who has access: Anyone
+  // 4. Copy the Web App URL and paste it into APPS_SCRIPT_URL below
+  const APPS_SCRIPT_URL = ""; // <-- paste your Google Apps Script URL here
+
+  // Fallback: localStorage (only works on same browser, for testing)
   const STORE_KEY = "jroc_coupons_v1";
-  function loadStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e) { return {}; } }
-  function saveStore(store) { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch(e) {} }
+  function localLoad() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e) { return {}; } }
+  function localSave(store) { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch(e) {} }
+
+  async function cloudSave(code, label, amount) {
+    if (!APPS_SCRIPT_URL) {
+      var store = localLoad();
+      store[code] = { amount: amount, label: label, used: false };
+      localSave(store);
+      return { ok: true };
+    }
+    try {
+      var res = await fetch(APPS_SCRIPT_URL + "?action=create&code=" + code + "&label=" + encodeURIComponent(label) + "&amount=" + amount);
+      var data = await res.json();
+      return data;
+    } catch(e) { return { ok: false, error: e.message }; }
+  }
+
+  async function cloudRedeem(code) {
+    if (!APPS_SCRIPT_URL) {
+      var store = localLoad();
+      if (!store[code]) return { ok: false, error: "invalid" };
+      if (store[code].used) return { ok: false, error: "used" };
+      store[code].used = true;
+      localSave(store);
+      return { ok: true, label: store[code].label, amount: store[code].amount };
+    }
+    try {
+      var res = await fetch(APPS_SCRIPT_URL + "?action=redeem&code=" + code);
+      var data = await res.json();
+      return data;
+    } catch(e) { return { ok: false, error: e.message }; }
+  }
 
   function handleSearch(val) {
     const q = val.trim().toLowerCase();
@@ -1170,9 +1252,7 @@
 
   function buildLi() {
     var img = document.createElement("img");
-    img.src = LOGO;
-    img.alt = "";
-    img.className = "pay-logo";
+    img.src = LOGO; img.alt = ""; img.className = "pay-logo";
     img.onerror = function() { this.style.display = "none"; };
     return img.outerHTML;
   }
@@ -1187,13 +1267,11 @@
     couponEntry.style.display = "none";
     document.getElementById("couponCodeInput").value = "";
     document.getElementById("couponResult").style.display = "none";
-
     var li = buildLi();
     var paypal  = "<a href=\"https://www.paypal.me/JojoLikemoney\" target=\"_blank\" class=\"pay-btn paypal\">" + li + " PayPal — paypal.me/JojoLikemoney</a>";
     var cashapp = "<a href=\"https://cash.app/$Jojogetzdabag\" target=\"_blank\" class=\"pay-btn cashapp\">" + li + " Cash App — $Jojogetzdabag</a>";
     var couponBtn = "<button class=\"pay-btn coupon-btn\" onclick=\"toggleCouponEntry()\">" + li + " Pay With A Coupon</button>";
     var rBase = "<a href=\"{URL}\" target=\"_blank\" class=\"pay-btn robux\">" + li + " {LABEL}</a>";
-
     if (type === "accessory") {
       opts.innerHTML = paypal + cashapp + rBase.replace("{URL}","https://www.roblox.com/catalog/94810828366880/Beanie-hat-mask").replace("{LABEL}","Robux — Buy on Roblox (350 R$)") + couponBtn;
       note.style.display = "block"; note.textContent = "When you buy you pick which item you want — you don't get all three. 350 R$ is the price per each item.";
@@ -1217,18 +1295,25 @@
     document.getElementById("couponResult").style.display = "none";
   }
 
-  function applyCoupon() {
+  async function applyCoupon() {
     var input = document.getElementById("couponCodeInput").value.trim().toUpperCase();
     var result = document.getElementById("couponResult");
+    var btn = document.querySelector(".apply-coupon-btn");
     result.style.display = "block";
     if (!input) { result.className = "fail"; result.textContent = "Please enter a coupon code."; return; }
-    var store = loadStore();
-    if (!store[input]) { result.className = "fail"; result.textContent = "Invalid coupon code. Please check and try again."; return; }
-    if (store[input].used) { result.className = "fail"; result.textContent = "This coupon has already been used."; return; }
-    store[input].used = true;
-    saveStore(store);
-    result.className = "success";
-    result.textContent = "Coupon applied! " + store[input].label + " — " + store[input].amount + " off. Show this screen to Jroc to confirm your order.";
+    result.className = ""; result.textContent = "Checking code...";
+    if (btn) { btn.disabled = true; btn.textContent = "Checking..."; }
+    var res = await cloudRedeem(input);
+    if (btn) { btn.disabled = false; btn.textContent = "Apply Coupon"; }
+    if (!res.ok) {
+      result.className = "fail";
+      if (res.error === "used") result.textContent = "This coupon has already been used by someone.";
+      else if (res.error === "invalid") result.textContent = "Invalid coupon code. Please check and try again.";
+      else result.textContent = "Error: " + (res.error || "unknown");
+    } else {
+      result.className = "success";
+      result.textContent = "Coupon applied! " + res.label + " — free. Show this screen to Jroc to confirm your order.";
+    }
   }
 
   function closeModal() { document.getElementById("payModal").classList.remove("open"); }
@@ -1240,8 +1325,7 @@
   function selectAmount(el, label, amt) {
     document.querySelectorAll(".amount-pick").forEach(function(b) { b.classList.remove("selected"); });
     el.classList.add("selected");
-    selectedAmount = amt;
-    selectedLabel = label;
+    selectedAmount = amt; selectedLabel = label;
   }
 
   function generateCode() {
@@ -1250,20 +1334,23 @@
     return seg() + "-" + seg() + "-" + seg();
   }
 
-  function generateCoupon() {
+  async function generateCoupon() {
     var pw = document.getElementById("couponPw").value;
     var errEl = document.getElementById("couponError");
     var output = document.getElementById("couponOutput");
-    errEl.style.display = "none";
-    output.style.display = "none";
+    var genBtn = document.querySelector(".gen-btn");
+    errEl.style.display = "none"; output.style.display = "none";
     if (pw !== "JrocCode") { errEl.style.display = "block"; errEl.textContent = "Incorrect password. Access denied."; return; }
     if (!selectedAmount || !selectedLabel) { errEl.style.display = "block"; errEl.textContent = "Please select a coupon type."; return; }
+    if (genBtn) { genBtn.disabled = true; genBtn.textContent = "Generating..."; }
     var code = generateCode();
-    var store = loadStore();
-    store[code] = { amount: selectedAmount, label: selectedLabel, used: false };
-    saveStore(store);
+    var res = await cloudSave(code, selectedLabel, selectedAmount);
+    if (genBtn) { genBtn.disabled = false; genBtn.textContent = "Generate Coupon"; }
+    if (!res.ok && APPS_SCRIPT_URL) { errEl.style.display = "block"; errEl.textContent = "Cloud error: " + (res.error || "unknown"); return; }
     document.getElementById("generatedCode").textContent = code;
-    document.getElementById("generatedAmount").textContent = selectedLabel + " — " + selectedAmount + " OFF";
+    document.getElementById("generatedAmount").textContent = selectedLabel;
+    var noUrl = !APPS_SCRIPT_URL;
+    document.getElementById("cloudNote").style.display = noUrl ? "block" : "none";
     output.style.display = "block";
     document.getElementById("couponPw").value = "";
   }
@@ -1275,6 +1362,12 @@
       btn.textContent = "Copied!";
       setTimeout(function() { btn.textContent = "Copy Code"; }, 1800);
     });
+  }
+
+  // Show setup panel toggle
+  function toggleSetup() {
+    var p = document.getElementById("setupPanel");
+    p.style.display = p.style.display === "block" ? "none" : "block";
   }
 </script>
 </body>
