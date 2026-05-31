@@ -1011,43 +1011,6 @@
       </div>
     </div>
 
-
-    <!-- SETUP GUIDE -->
-    <div style="margin-top:20px;">
-      <button onclick="toggleSetup()" style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.3);color:var(--muted);padding:8px 18px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:0.85rem;letter-spacing:2px;cursor:pointer;text-transform:uppercase;">Setup Cloud Coupons Guide</button>
-      <div id="setupPanel" style="display:none;margin-top:14px;padding:20px;background:rgba(0,20,60,0.5);border:1px solid rgba(0,102,255,0.2);border-radius:8px;font-size:0.85rem;line-height:1.7;color:var(--muted);">
-        <div style="color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;margin-bottom:12px;">One-Time Cloud Setup (Free)</div>
-        <b style="color:#fff;">Step 1:</b> Go to <a href="https://script.google.com" target="_blank" style="color:var(--accent);">script.google.com</a> → New Project<br>
-        <b style="color:#fff;">Step 2:</b> Delete everything and paste this code:<br>
-        <pre style="margin:10px 0;padding:12px;background:#020b18;border:1px solid rgba(0,102,255,0.2);border-radius:4px;color:#00ccff;font-size:0.75rem;overflow-x:auto;white-space:pre-wrap;">const SHEET_KEY = "jroc_coupons";
-function doGet(e) {
-  var props = PropertiesService.getScriptProperties();
-  var action = e.parameter.action;
-  var code = (e.parameter.code || "").toUpperCase();
-  if (action === "create") {
-    var obj = { label: e.parameter.label, amount: e.parameter.amount, used: false };
-    props.setProperty(code, JSON.stringify(obj));
-    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
-  }
-  if (action === "redeem") {
-    var raw = props.getProperty(code);
-    if (!raw) return ContentService.createTextOutput(JSON.stringify({ok:false,error:"invalid"})).setMimeType(ContentService.MimeType.JSON);
-    var data = JSON.parse(raw);
-    if (data.used) return ContentService.createTextOutput(JSON.stringify({ok:false,error:"used"})).setMimeType(ContentService.MimeType.JSON);
-    data.used = true;
-    props.setProperty(code, JSON.stringify(data));
-    return ContentService.createTextOutput(JSON.stringify({ok:true,label:data.label,amount:data.amount})).setMimeType(ContentService.MimeType.JSON);
-  }
-  return ContentService.createTextOutput(JSON.stringify({ok:false,error:"unknown action"})).setMimeType(ContentService.MimeType.JSON);
-}</pre>
-        <b style="color:#fff;">Step 3:</b> Click Deploy → New Deployment → Web App<br>
-        &nbsp;&nbsp;&nbsp;• Execute as: <b style="color:#fff;">Me</b><br>
-        &nbsp;&nbsp;&nbsp;• Who has access: <b style="color:#fff;">Anyone</b><br>
-        <b style="color:#fff;">Step 4:</b> Copy the Web App URL<br>
-        <b style="color:#fff;">Step 5:</b> Open index.html in a text editor, find <code style="color:#ff9944;">const APPS_SCRIPT_URL = "";</code> and paste your URL inside the quotes. Save and re-upload.
-      </div>
-    </div>
-
   </div>
 
   <!-- ======================== HUNT SECTION ======================== -->
